@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head >
+  <meta charset="UTF-8" >
+  <title >five in a row</title >
+  <style >
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .main {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .buttons {
+      position: absolute;
+      right: -100px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .button {
+      margin-bottom: 12px;
+      padding: 6px 12px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .goBoard {
+      box-shadow: 4px 5px 20px rgba(0, 0, 0, 0.63);
+    }
+
+  </style >
+</head >
+<body >
+
+<div class="main" >
+  <div class="container" >
+    <canvas id="goBoard" class="goBoard" width="646" height="646" ></canvas >
+    <div class="buttons" >
+      <button class="button newRound" >New Round</button >
+      <button class="button undo" >Undo</button >
+      <button class="button redo" >Redo</button >
+    </div >
+  </div >
+</div >
+
+<script src="js/Constants.js" ></script >
+<script src="js/EventHub.js" ></script >
+<script src="js/model/Player.js" ></script >
+<script src="js/model/Board.js" ></script >
+<script src="js/components/GoBoard.js" ></script >
+<script src="js/components/Piece.js" ></script >
+<script src="js/components/CirclePiece.js" ></script >
+<script src="js/components/CrossPiece.js" ></script >
+<script src="js/View.js" ></script >
+<script src="js/Controller.js" ></script >
+<script src="js/App.js" ></script >
+<script >
+
+  const app = new App();
+  app.init();
+
+</script >
+</body >
+</html >
