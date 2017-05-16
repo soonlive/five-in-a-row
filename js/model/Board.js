@@ -270,8 +270,8 @@ class Board {
   handlePieceMoved(column, row) {
     const { currentPlayer, eventHub } = this;
     if (this.isPlaying && this.isCellAvailable(column, row)) {
-      this.recordStep(column, row, currentPlayer);
       this.processPieceMoved(column, row, currentPlayer);
+      this.recordStep(column, row, currentPlayer);
     }
   }
 
