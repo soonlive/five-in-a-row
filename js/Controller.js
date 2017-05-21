@@ -19,7 +19,6 @@ class Controller {
     board.addMovedListener(this.handleMoved.bind(this));
     board.addWinNotifiedListener(this.handleWinNotified.bind(this));
     board.addPointRemovedListener(this.handlePointRemoved.bind(this));
-    board.addSameRowPointsResetListener(this.handleSameRowPointsReset.bind(this));
     this.newRound();
   }
 
@@ -37,7 +36,7 @@ class Controller {
     view.newRound();
   }
 
-  turnover(player){
+  turnover(player) {
     const { view, board, playerI, playerII } = this;
     const nextPlayer = player === playerI ? playerII : playerI;
     board.setCurrentPlayer(nextPlayer);
@@ -51,8 +50,8 @@ class Controller {
     this.turnover(player);
   }
 
-  handleWinNotified(playerId, sameLineStones) {
-    this.view.notifyWin(playerId, sameLineStones);
+  handleWinNotified(playerId, sameRowStones) {
+    this.view.notifyWin(playerId, sameRowStones);
   }
 
   handlePointRemoved({ column, row }) {
@@ -70,16 +69,18 @@ class Controller {
   }
 
   handleUndoBtnClick() {
-    const { board } = this;
+    const { board, view } = this;
+    const hasCrossLine = board.hasWinner();
+    if (hasCrossLine) {
+      const sameRowPoints = board.getSameRowPoints();
+      const player = board.getPlayer(sameRowPoints[0].playerId);
+      view.removeCrossLine(sameRowPoints, player.getStoneType());
+    }
     board.undo();
   }
 
   handleRedoBtnClick() {
     const { board } = this;
     board.redo();
-  }
-
-  handleSameRowPointsReset(sameRowStones, player) {
-    this.view.resetStones(sameRowStones, player.getStoneType());
   }
 }

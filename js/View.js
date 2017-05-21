@@ -41,9 +41,9 @@ class View {
     this.board.addStone(column, row, type);
   }
 
-  notifyWin(playerId, sameLineStones) {
-    let { row: row1, column: column1 } = sameLineStones[0];
-    let { row: row2, column: column2 } = sameLineStones[sameLineStones.length - 1];
+  notifyWin(playerId, sameRowStones) {
+    let { row: row1, column: column1 } = sameRowStones[0];
+    let { row: row2, column: column2 } = sameRowStones[sameRowStones.length - 1];
     this.board.drawCrossLine(row1, column1, row2, column2);
   }
 
@@ -51,12 +51,8 @@ class View {
     this.board.removeStone(column, row);
   }
 
-  resetStones(stones, type) {
-    const { board } = this;
-    stones.forEach((stone) => {
-      board.removeStone(stone.column, stone.row);
-      board.addStone(stone.column, stone.row, type)
-    });
+  removeCrossLine(sameRowPoints, stoneType) {
+    this.board.removeCrossLine(sameRowPoints, stoneType);
   }
 
   addBoardClickListener(listener) {

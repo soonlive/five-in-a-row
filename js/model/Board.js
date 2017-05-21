@@ -13,7 +13,7 @@ class Board {
     this.isPlaying = false;
     this.players = [];
     this.sameRowPointsSize = sameRowPointsSize;
-    this.sameRowPoints = null;
+    this.sameRowPoints = [];
     this.winner = null;
   }
 
@@ -27,7 +27,7 @@ class Board {
     this.currentPlayer = null;
     this.isPlaying = true;
     this.players = [];
-    this.sameRowPoints = null;
+    this.sameRowPoints = [];
     this.winner = null;
   }
 
@@ -39,7 +39,7 @@ class Board {
     return this.currentPlayer;
   }
 
-  getPlayer(playerId){
+  getPlayer(playerId) {
     return this.players.find(player => player.id === playerId);
   }
 
@@ -87,7 +87,7 @@ class Board {
     let sameRowPoints = [point];
     let direction = -1;
     let currentColumn = column;
-    while (sameRowPoints.length < Constants.WINNING_STONES_SIZE) {
+    while (sameRowPoints.length < this.sameRowPointsSize) {
       currentColumn += direction;
       if (this.points[row][currentColumn] === playerId) {
         const targetPoint = new Point(currentColumn, row, playerId);
@@ -217,7 +217,7 @@ class Board {
     this.eventHub.emit('point_add', point);
   }
 
-  removePoint(point){
+  removePoint(point) {
     this.points[point.row][point.column] = undefined;
     this.eventHub.emit('point_remove', point);
   }
@@ -236,7 +236,7 @@ class Board {
     this.judgement(point);
   }
 
-  MovedPoints(point) {
+  stackPoint(point) {
     this.pointStack.push(point);
     this.undoPointStack = [];
   }
@@ -247,19 +247,18 @@ class Board {
     if (point) {
       undoPointStack.push(point);
 
-      if (this.hasWinner()) {
-        this.winner = null;
-        this.sameRowPoints = null;
-        eventHub.emit('sameRowPoints_reset', sameRowPoints, winner);
-      }
+      const player = players.find(player => player.id === point.playerId);
+      this.setCurrentPlayer(player);
+      this.removePoint(point);
 
       if (!isPlaying) {
         this.isPlaying = true;
       }
 
-      const player = players.find(player => player.id === point.playerId);
-      this.setCurrentPlayer(player);
-      this.removePoint(point);
+      if (this.hasWinner()) {
+        this.winner = null;
+        this.sameRowPoints = [];
+      }
     }
   }
 
@@ -279,7 +278,7 @@ class Board {
     const { currentPlayer, eventHub } = this;
     if (this.isPlaying && currentPlayer.id === point.playerId && this.isCellAvailable(point)) {
       this.processMoved(point);
-      this.MovedPoints(point);
+      this.stackPoint(point);
     }
   }
 
@@ -294,10 +293,5 @@ class Board {
   addPointRemovedListener(listener) {
     this.eventHub.on('point_remove', listener);
   }
-
-  addSameRowPointsResetListener(listener) {
-    this.eventHub.on('sameRowPoints_reset', listener);
-  }
-
 
 }

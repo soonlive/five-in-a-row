@@ -79,7 +79,7 @@ class GoBoard {
     };
 
     let stone;
-    if(type === 'cross'){
+    if (type === 'cross') {
       stone = new Stone({});
     }
 
@@ -108,6 +108,15 @@ class GoBoard {
     ctx.stroke();
     ctx.closePath();
 
+  }
+
+  removeCrossLine(stones, stoneType) {
+    stones.forEach((stone, index) => {
+      if(stones.length - 1 !== index){
+        this.removeStone(stone.column, stone.row);
+        this.addStone(stone.column, stone.row, stoneType)
+      }
+    });
   }
 
   removeStone(column, row) {

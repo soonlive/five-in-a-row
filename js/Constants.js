@@ -4,7 +4,7 @@
 
 
 const Constants = {
-  WINNING_STONES_SIZE: 5,
+  SAME_ROW_POINTS_SIZE: 5,
   SIZE: 15,
   CELL_SIZE: 38,
   STONE_SIZE: 28,
