@@ -8,24 +8,25 @@ class Player {
     this.eventHub = new EventHub();
   }
 
-  setPieceType(type) {
-    this.pieceType = type;
+  setStoneType(type) {
+    this.stoneType = type;
   }
 
-  getPieceType() {
-    return this.pieceType;
+  getStoneType() {
+    return this.stoneType;
   }
 
-  movePiece(column, row) {
-    this.eventHub.emit('piece_moved', column, row);
+  move(column, row) {
+    const point = new Point(column, row, this.id);
+    this.eventHub.emit('moved', point);
   }
 
-  addPieceMovedListener(listener) {
-    this.eventHub.on('piece_moved', listener);
+  addMovedListener(listener) {
+    this.eventHub.on('moved', listener);
   }
 
-  removePieceMovedListener(listener) {
-    this.eventHub.removeListener('piece_moved', listener);
+  removeMovedListener(listener) {
+    this.eventHub.removeListener('moved', listener);
   }
 
 }

@@ -2,7 +2,7 @@
  * Created by Xin on 12/05/2017.
  */
 
-class CirclePiece extends Piece {
+class CircleStone extends Stone {
   constructor(props) {
     super(props);
   }

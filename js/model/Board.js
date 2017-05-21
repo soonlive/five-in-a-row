@@ -3,38 +3,32 @@
  */
 
 class Board {
-  constructor(size, winningPiecesSize) {
+  constructor(size, sameRowPointsSize) {
     this.eventHub = new EventHub();
     this.size = size;
-    this.pieces = [];
-    this.steps = [];
-    this.undoSteps = [];
+    this.points = [];
+    this.pointStack = [];
+    this.undoPointStack = [];
     this.currentPlayer = null;
     this.isPlaying = false;
     this.players = [];
-    this.winningPiecesSize = winningPiecesSize;
-    this.winningPieces = null;
+    this.sameRowPointsSize = sameRowPointsSize;
+    this.sameRowPoints = null;
     this.winner = null;
-    this.firstPlayer = null;
   }
 
   newRound() {
     this.players.forEach((player) => {
-      player.removePieceMovedListener(this.handlePieceMoved);
+      player.removeMovedListener(this.handleMoved);
     });
-    this.pieces = [];
-    this.steps = [];
-    this.undoSteps = [];
+    this.points = [];
+    this.pointStack = [];
+    this.undoPointStack = [];
     this.currentPlayer = null;
     this.isPlaying = true;
     this.players = [];
-    this.winningPieces = null;
+    this.sameRowPoints = null;
     this.winner = null;
-    this.firstPlayer = null;
-  }
-
-  setFirstPlayer(player) {
-    this.firstPlayer = player;
   }
 
   setCurrentPlayer(player) {
@@ -45,6 +39,10 @@ class Board {
     return this.currentPlayer;
   }
 
+  getPlayer(playerId){
+    return this.players.find(player => player.id === playerId);
+  }
+
   hasWinner() {
     return this.winner !== null;
   }
@@ -53,20 +51,21 @@ class Board {
     return this.winner;
   }
 
-  getWinningPieces() {
-    return this.winningPieces;
+  getSameRowPoints() {
+    return this.sameRowPoints;
   }
 
   addPlayer(player) {
     this.players.push(player);
-    player.addPieceMovedListener(this.handlePieceMoved.bind(this));
+    player.addMovedListener(this.handleMoved.bind(this));
   }
 
   whoseTurn() {
     return this.currentPlayer;
   }
 
-  isCellAvailable(column, row) {
+  isCellAvailable(point) {
+    const { column, row } = point;
     const integerReg = /^\+?([1-9]+)\d*$/g;
 
     /* check whether integer */
@@ -80,20 +79,22 @@ class Board {
     }
 
     /* check whether existed already */
-    return this.pieces[row] === undefined || this.pieces[row][column] === undefined;
+    return this.points[row] === undefined || this.points[row][column] === undefined;
   }
 
-  countLeftRight(column, row, playerId) {
-    let linePieces = [{ row, column }];
+  countLeftRight(point) {
+    const { column, row, playerId } = point;
+    let sameRowPoints = [point];
     let direction = -1;
     let currentColumn = column;
-    while (linePieces.length < Constants.WINNING_PIECES_SIZE) {
+    while (sameRowPoints.length < Constants.WINNING_STONES_SIZE) {
       currentColumn += direction;
-      if (this.pieces[row][currentColumn] === playerId) {
+      if (this.points[row][currentColumn] === playerId) {
+        const targetPoint = new Point(currentColumn, row, playerId);
         if (direction === -1) {
-          linePieces.unshift({ row, column: currentColumn, id: playerId });
+          sameRowPoints.unshift(targetPoint);
         } else {
-          linePieces.push({ row, column: currentColumn, id: playerId });
+          sameRowPoints.push(targetPoint);
         }
       } else if (direction === -1) {
         direction = 1;
@@ -102,20 +103,22 @@ class Board {
         break;
       }
     }
-    return linePieces;
+    return sameRowPoints;
   }
 
-  countUpDown(column, row, playerId) {
-    let linePieces = [{ row, column }];
+  countUpDown(point) {
+    const { column, row, playerId } = point;
+    let sameRowPoints = [{ row, column }];
     let direction = -1;
     let currentRow = row;
-    while (linePieces.length < this.winningPiecesSize) {
+    while (sameRowPoints.length < this.sameRowPointsSize) {
       currentRow += direction;
-      if (this.pieces[currentRow] && this.pieces[currentRow][column] === playerId) {
+      if (this.points[currentRow] && this.points[currentRow][column] === playerId) {
+        const targetPoint = new Point(column, currentRow, playerId);
         if (direction === -1) {
-          linePieces.unshift({ row: currentRow, column, id: playerId });
+          sameRowPoints.unshift(targetPoint);
         } else {
-          linePieces.push({ row: currentRow, column, id: playerId });
+          sameRowPoints.push(targetPoint);
         }
       } else if (direction === -1) {
         direction = 1;
@@ -124,22 +127,24 @@ class Board {
         break;
       }
     }
-    return linePieces;
+    return sameRowPoints;
   }
 
-  countLeftTop(column, row, playerId) {
-    let linePieces = [{ row, column }];
+  countLeftTop(point) {
+    const { column, row, playerId } = point;
+    let sameRowPoints = [{ row, column }];
     let direction = -1;
     let currentColumn = column;
     let currentRow = row;
-    while (linePieces.length < this.winningPiecesSize) {
+    while (sameRowPoints.length < this.sameRowPointsSize) {
       currentColumn += direction;
       currentRow += direction;
-      if (this.pieces[currentRow] && this.pieces[currentRow][currentColumn] === playerId) {
+      if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
+        const targetPoint = new Point(currentColumn, currentRow, playerId);
         if (direction === -1) {
-          linePieces.unshift({ row: currentRow, column: currentColumn, id: playerId });
+          sameRowPoints.unshift(targetPoint);
         } else {
-          linePieces.push({ row: currentRow, column: currentColumn, id: playerId });
+          sameRowPoints.push(targetPoint);
         }
       } else if (direction === -1) {
         direction = 1;
@@ -149,22 +154,24 @@ class Board {
         break;
       }
     }
-    return linePieces;
+    return sameRowPoints;
   }
 
-  countRightTop(column, row, playerId) {
-    let linePieces = [{ row, column }];
+  countRightTop(point) {
+    const { column, row, playerId } = point;
+    let sameRowPoints = [{ row, column }];
     let direction = -1;
     let currentColumn = column;
     let currentRow = row;
-    while (linePieces.length < this.winningPiecesSize) {
+    while (sameRowPoints.length < this.sameRowPointsSize) {
       currentColumn += direction;
       currentRow -= direction;
-      if (this.pieces[currentRow] && this.pieces[currentRow][currentColumn] === playerId) {
+      if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
+        const targetPoint = new Point(currentColumn, currentRow, playerId);
         if (direction === -1) {
-          linePieces.unshift({ row: currentRow, column: currentColumn, id: playerId });
+          sameRowPoints.unshift(targetPoint);
         } else {
-          linePieces.push({ row: currentRow, column: currentColumn, id: playerId });
+          sameRowPoints.push(targetPoint);
         }
       } else if (direction === -1) {
         direction = 1;
@@ -174,121 +181,122 @@ class Board {
         break;
       }
     }
-    return linePieces;
+    return sameRowPoints;
   }
 
 
-  findSameLinePieces(column, row, playerId) {
-    let linePieces = this.countLeftRight(column, row, playerId);
+  findSameRowPoints(point) {
+    let sameRowPoints = this.countLeftRight(point);
 
-    if (linePieces.length < this.winningPiecesSize) {
-      linePieces = this.countUpDown(column, row, playerId);
+    if (sameRowPoints.length < this.sameRowPointsSize) {
+      sameRowPoints = this.countUpDown(point);
     }
 
-    if (linePieces.length < this.winningPiecesSize) {
-      linePieces = this.countLeftTop(column, row, playerId);
+    if (sameRowPoints.length < this.sameRowPointsSize) {
+      sameRowPoints = this.countLeftTop(point);
     }
 
-    if (linePieces.length < this.winningPiecesSize) {
-      linePieces = this.countRightTop(column, row, playerId);
+    if (sameRowPoints.length < this.sameRowPointsSize) {
+      sameRowPoints = this.countRightTop(point);
     }
 
-    return linePieces;
+    return sameRowPoints;
   }
 
-  notifyWin(player, sameLinePieces) {
+  notifyWin(playerId, sameRowPoints) {
     this.isPlaying = false;
-    this.winner = player;
-    this.winningPieces = sameLinePieces;
-    this.eventHub.emit('notify_win', player.id, sameLinePieces);
+    this.winner = this.players.find(player => player.id === playerId);
+    this.sameRowPoints = sameRowPoints;
+    this.eventHub.emit('notify_win', playerId, sameRowPoints);
   }
 
-  addPiece(column, row, player) {
-    this.pieces[row] = this.pieces[row] || [];
-    this.pieces[row][column] = player.id;
-    this.eventHub.emit('piece_moved', column, row);
+  addPoint(point) {
+    const { column, row, playerId } = point;
+    this.points[row] = this.points[row] || [];
+    this.points[row][column] = playerId;
+    this.eventHub.emit('point_add', point);
   }
 
-  judgement(column, row, player) {
-    const sameLinePieces = this.findSameLinePieces(column, row, player.id);
+  removePoint(point){
+    this.points[point.row][point.column] = undefined;
+    this.eventHub.emit('point_remove', point);
+  }
 
-    if (sameLinePieces.length >= this.winningPiecesSize) {
-      this.notifyWin(player, sameLinePieces);
+  judgement(point) {
+    const { column, row, playerId } = point;
+    const sameRowPoints = this.findSameRowPoints(point);
+
+    if (sameRowPoints.length >= this.sameRowPointsSize) {
+      this.notifyWin(playerId, sameRowPoints);
     }
   }
 
-  processPieceMoved(column, row, player) {
-    this.addPiece(column, row, player);
-    this.judgement(column, row, player);
+  processMoved(point) {
+    this.addPoint(point);
+    this.judgement(point);
   }
 
-  recordStep(column, row, player) {
-    this.steps.push({
-      column,
-      row,
-      id: player.id,
-    });
-    this.undoSteps = [];
+  MovedPoints(point) {
+    this.pointStack.push(point);
+    this.undoPointStack = [];
   }
 
   undo() {
-    const { steps, undoSteps, players, pieces, winningPieces, winner, isPlaying, eventHub } = this;
-    const step = steps.pop();
-    if (step) {
-      undoSteps.push(step);
-      pieces[step.row][step.column] = undefined;
+    const { pointStack, undoPointStack, players, points, sameRowPoints, winner, isPlaying, eventHub } = this;
+    const point = pointStack.pop();
+    if (point) {
+      undoPointStack.push(point);
 
       if (this.hasWinner()) {
         this.winner = null;
-        this.winningPieces = null;
-        eventHub.emit('winningPieces_reset', winningPieces, winner);
+        this.sameRowPoints = null;
+        eventHub.emit('sameRowPoints_reset', sameRowPoints, winner);
       }
 
       if (!isPlaying) {
         this.isPlaying = true;
       }
 
-      const player = players.find(p => p.id === step.id);
+      const player = players.find(player => player.id === point.playerId);
       this.setCurrentPlayer(player);
-
-      eventHub.emit('undo', step);
+      this.removePoint(point);
     }
   }
 
 
   redo() {
-    const { steps, undoSteps, players, pieces, winningPieces, winner, isPlaying, eventHub } = this;
-    const step = undoSteps.pop();
-    if (step) {
-      steps.push(step);
-      const player = players.find(p => p.id === step.id);
+    const { pointStack, undoPointStack, players, points, sameRowPoints, winner, isPlaying, eventHub } = this;
+    const point = undoPointStack.pop();
+    if (point) {
+      pointStack.push(point);
+      const player = this.getPlayer(point.playerId);
       this.setCurrentPlayer(player);
-      this.processPieceMoved(step.column, step.row, player);
+      this.processMoved(point);
     }
   }
 
-  handlePieceMoved(column, row) {
+  handleMoved(point) {
     const { currentPlayer, eventHub } = this;
-    if (this.isPlaying && this.isCellAvailable(column, row)) {
-      this.processPieceMoved(column, row, currentPlayer);
-      this.recordStep(column, row, currentPlayer);
+    if (this.isPlaying && currentPlayer.id === point.playerId && this.isCellAvailable(point)) {
+      this.processMoved(point);
+      this.MovedPoints(point);
     }
   }
 
-  addPieceMovedListener(listener) {
-    this.eventHub.on('piece_moved', listener);
+  addMovedListener(listener) {
+    this.eventHub.on('point_add', listener);
   }
 
   addWinNotifiedListener(listener) {
     this.eventHub.on('notify_win', listener);
   }
 
-  addUndoListener(listener) {
-    this.eventHub.on('undo', listener);
+  addPointRemovedListener(listener) {
+    this.eventHub.on('point_remove', listener);
   }
 
-  addWinningPiecesResetListener(listener) {
-    this.eventHub.on('winningPieces_reset', listener);
+  addSameRowPointsResetListener(listener) {
+    this.eventHub.on('sameRowPoints_reset', listener);
   }
 
 

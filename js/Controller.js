@@ -16,17 +16,17 @@ class Controller {
     view.addNewRoundClickListener(this.handleNewRoundBtnClick.bind(this));
     view.addUndoBtnClickListener(this.handleUndoBtnClick.bind(this));
     view.addRedoBtnClickListener(this.handleRedoBtnClick.bind(this));
-    board.addPieceMovedListener(this.handlePieceMoved.bind(this));
+    board.addMovedListener(this.handleMoved.bind(this));
     board.addWinNotifiedListener(this.handleWinNotified.bind(this));
-    board.addUndoListener(this.handleUndo.bind(this));
-    board.addWinningPiecesResetListener(this.handleWinningPiecesReset.bind(this));
+    board.addPointRemovedListener(this.handlePointRemoved.bind(this));
+    board.addSameRowPointsResetListener(this.handleSameRowPointsReset.bind(this));
     this.newRound();
   }
 
   newRound() {
     let { view, board, playerI, playerII } = this;
-    playerI.setPieceType('circle');
-    playerII.setPieceType('cross');
+    playerI.setStoneType('circle');
+    playerII.setStoneType('cross');
 
     board.newRound();
     board.addPlayer(playerI);
@@ -37,26 +37,32 @@ class Controller {
     view.newRound();
   }
 
-  handlePieceMoved(column, row) {
+  turnover(player){
     const { view, board, playerI, playerII } = this;
-    const currentPlayer = board.getCurrentPlayer();
-    const nextPlayer = currentPlayer.id === playerI.id ? playerII : playerI;
+    const nextPlayer = player === playerI ? playerII : playerI;
     board.setCurrentPlayer(nextPlayer);
-    view.addPiece(column, row, currentPlayer.getPieceType());
   }
 
-  handleWinNotified(playerId, sameLinePieces) {
-    this.view.notifyWin(playerId, sameLinePieces);
+  handleMoved(point) {
+    const { view, board } = this;
+    const { column, row, playerId } = point;
+    const player = board.getPlayer(playerId);
+    view.addStone(column, row, player.getStoneType());
+    this.turnover(player);
   }
 
-  handleUndo({ column, row }) {
+  handleWinNotified(playerId, sameLineStones) {
+    this.view.notifyWin(playerId, sameLineStones);
+  }
+
+  handlePointRemoved({ column, row }) {
     this.view.undo(column, row);
   }
 
   handleBoardClick(column, row) {
     const { board } = this;
     const currentPlayer = board.getCurrentPlayer();
-    currentPlayer.movePiece(column, row);
+    currentPlayer.move(column, row);
   }
 
   handleNewRoundBtnClick() {
@@ -73,7 +79,7 @@ class Controller {
     board.redo();
   }
 
-  handleWinningPiecesReset(winningPieces, player) {
-    this.view.resetPieces(winningPieces, player.getPieceType());
+  handleSameRowPointsReset(sameRowStones, player) {
+    this.view.resetStones(sameRowStones, player.getStoneType());
   }
 }

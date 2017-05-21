@@ -12,12 +12,12 @@ class View {
       boardLineColor: Constants.BOARD_LINE_COLOR,
       boardLineWith: Constants.BOARD_LINE_WIDTH,
       cellSize: Constants.CELL_SIZE,
-      circlePieceColor: Constants.CIRCLE_PIECE_COLOR,
-      crossPieceColor: Constants.CROSS_PIECE_COLOR,
+      circleStoneColor: Constants.CIRCLE_STONE_COLOR,
+      crossStoneColor: Constants.CROSS_STONE_COLOR,
       ctx: this.ctx,
       size: Constants.SIZE,
-      pieceLineWidth: Constants.PIECE_LINE_WITH,
-      pieceSize: Constants.PIECE_SIZE,
+      stoneLineWidth: Constants.STONE_LINE_WITH,
+      stoneSize: Constants.STONE_SIZE,
     });
     this.newRoundBtn = document.querySelector('.button.newRound');
     this.undoBtn = document.querySelector('.button.undo');
@@ -37,25 +37,25 @@ class View {
     board.drawBoard();
   }
 
-  addPiece(column, row, type) {
-    this.board.addPiece(column, row, type);
+  addStone(column, row, type) {
+    this.board.addStone(column, row, type);
   }
 
-  notifyWin(playerId, sameLinePieces) {
-    let { row: row1, column: column1 } = sameLinePieces[0];
-    let { row: row2, column: column2 } = sameLinePieces[sameLinePieces.length - 1];
+  notifyWin(playerId, sameLineStones) {
+    let { row: row1, column: column1 } = sameLineStones[0];
+    let { row: row2, column: column2 } = sameLineStones[sameLineStones.length - 1];
     this.board.drawCrossLine(row1, column1, row2, column2);
   }
 
   undo(column, row) {
-    this.board.removePiece(column, row);
+    this.board.removeStone(column, row);
   }
 
-  resetPieces(pieces, type) {
+  resetStones(stones, type) {
     const { board } = this;
-    pieces.forEach((piece) => {
-      board.removePiece(piece.column, piece.row);
-      board.addPiece(piece.column, piece.row, type)
+    stones.forEach((stone) => {
+      board.removeStone(stone.column, stone.row);
+      board.addStone(stone.column, stone.row, type)
     });
   }
 

@@ -2,7 +2,7 @@
  * Created by Xin on 12/05/2017.
  */
 
-class Piece {
+class Stone {
   constructor({ ctx, color, size, lineWidth }) {
     this.ctx = ctx;
     this.size = size;

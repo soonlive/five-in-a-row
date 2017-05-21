@@ -3,7 +3,7 @@
  */
 
 class GoBoard {
-  constructor({ boardBackgroundColor, boardLineColor, boardLineWith, cellSize, circlePieceColor, crossPieceColor, ctx, size, pieceLineWidth, pieceSize, }) {
+  constructor({ boardBackgroundColor, boardLineColor, boardLineWith, cellSize, circleStoneColor, crossStoneColor, ctx, size, stoneLineWidth, stoneSize, }) {
     this.eventHub = new EventHub();
     this.ctx = ctx;
     this.size = size;
@@ -11,15 +11,15 @@ class GoBoard {
     this.boardLineColor = boardLineColor;
     this.boardLineWith = boardLineWith;
     this.cellSize = cellSize;
-    this.circlePieceColor = circlePieceColor;
-    this.crossPieceColor = crossPieceColor;
-    this.pieceLineWidth = pieceLineWidth;
-    this.pieceSize = pieceSize;
+    this.circleStoneColor = circleStoneColor;
+    this.crossStoneColor = crossStoneColor;
+    this.stoneLineWidth = stoneLineWidth;
+    this.stoneSize = stoneSize;
 
 
     this.halfCellSize = this.cellSize / 2;
     this.deltaSize = this.size + 2;
-    this.pieceSpaceSize = (this.cellSize - this.pieceSize) / 2;
+    this.stoneSpaceSize = (this.cellSize - this.stoneSize) / 2;
     this.height = this.width = this.cellSize * this.deltaSize;
     this.lineLength = this.width - cellSize;
 
@@ -68,26 +68,30 @@ class GoBoard {
   }
 
 
-  addPiece(column, row, type) {
-    const { ctx, pieceSize, pieceLineWidth, circlePieceColor, crossPieceColor } = this;
+  addStone(column, row, type) {
+    const { ctx, stoneSize, stoneLineWidth, circleStoneColor, crossStoneColor } = this;
     const { x, y } = this.transformToXY(column, row);
 
-    const pieceParams = {
+    const stoneParams = {
       ctx,
-      lineWidth: pieceLineWidth,
-      size: pieceSize,
+      lineWidth: stoneLineWidth,
+      size: stoneSize,
     };
 
-    let piece;
-    if (type === 'circle') {
-      pieceParams.color = circlePieceColor;
-      piece = new CirclePiece(pieceParams);
-    } else {
-      pieceParams.color = crossPieceColor;
-      piece = new CrossPiece(pieceParams);
+    let stone;
+    if(type === 'cross'){
+      stone = new Stone({});
     }
 
-    piece.move(x, y);
+    if (type === 'circle') {
+      stoneParams.color = circleStoneColor;
+      stone = new CircleStone(stoneParams);
+    } else {
+      stoneParams.color = crossStoneColor;
+      stone = new CrossStone(stoneParams);
+    }
+
+    stone.move(x, y);
   }
 
   drawCrossLine(row1, column1, row2, column2) {
@@ -106,8 +110,8 @@ class GoBoard {
 
   }
 
-  removePiece(column, row) {
-    const { ctx, pieceSize, pieceLineWidth, halfCellSize, cellSize, boardLineWith, boardLineColor, boardBackgroundColor } = this;
+  removeStone(column, row) {
+    const { ctx, stoneSize, stoneLineWidth, halfCellSize, cellSize, boardLineWith, boardLineColor, boardBackgroundColor } = this;
     let { x, y } = this.transformToXY(column, row);
 
     x = x - halfCellSize;
@@ -136,7 +140,7 @@ class GoBoard {
   }
 
   /**
-   * calculate the column and row of piece base on x,y
+   * calculate the column and row of stone base on x,y
    * @param x
    * @param y
    * @returns {{column: number, row: number}}

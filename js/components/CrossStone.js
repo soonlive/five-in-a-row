@@ -2,7 +2,7 @@
  * Created by Xin on 12/05/2017.
  */
 
-class CrossPiece extends Piece {
+class CrossStone extends Stone {
   constructor(props) {
     super(props);
   }
