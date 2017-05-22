@@ -40,6 +40,10 @@ class Controller {
     const { view, board, playerI, playerII } = this;
     const nextPlayer = player === playerI ? playerII : playerI;
     board.setCurrentPlayer(nextPlayer);
+    // if(nextPlayer instanceof AIPlayer){
+    //   const move = nextPlayer.think(board);
+    //   nextPlayer.move(move.column, move.row);
+    // }
   }
 
   handleMoved(point) {

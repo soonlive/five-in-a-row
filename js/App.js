@@ -4,8 +4,8 @@
 
 class App {
   constructor() {
-    this.playerI = new Player('circle');
-    this.playerII = new Player('cross');
+    this.playerI = new Player('playerI');
+    this.playerII = new AIPlayer('playerII');
     this.board = new Board(Constants.SIZE, Constants.SAME_ROW_POINTS_SIZE);
     this.view = new View();
     this.controller = new Controller(this.view, this.board, this.playerI, this.playerII);

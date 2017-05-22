@@ -6,7 +6,7 @@ class Board {
   constructor(size, sameRowPointsSize) {
     this.eventHub = new EventHub();
     this.size = size;
-    this.points = [];
+    this.points = null;
     this.pointStack = [];
     this.undoPointStack = [];
     this.currentPlayer = null;
@@ -21,7 +21,10 @@ class Board {
     this.players.forEach((player) => {
       player.removeMovedListener(this.handleMoved);
     });
-    this.points = [];
+    this.points = new Array(this.size + 1).fill().map(() => {
+      return new Array(this.size + 1);
+    });
+
     this.pointStack = [];
     this.undoPointStack = [];
     this.currentPlayer = null;
@@ -55,6 +58,25 @@ class Board {
     return this.sameRowPoints;
   }
 
+  getAvailableMoves() {
+    return Board.findAvailableMoves(this.points);
+  }
+
+  static findAvailableMoves(points) {
+    const moves = [];
+    for (let i = 1; i < points.length; i++) {
+      for (let j = 1; j < points.length; j++) {
+        if (!points[i][j]) {
+          moves.push({
+            row: i,
+            column: j,
+          });
+        }
+      }
+    }
+    return moves;
+  }
+
   addPlayer(player) {
     this.players.push(player);
     player.addMovedListener(this.handleMoved.bind(this));
@@ -64,8 +86,7 @@ class Board {
     return this.currentPlayer;
   }
 
-  isCellAvailable(point) {
-    const { column, row } = point;
+  isMoveAvailable(column, row) {
     const integerReg = /^\+?([1-9]+)\d*$/g;
 
     /* check whether integer */
@@ -108,7 +129,7 @@ class Board {
 
   countUpDown(point) {
     const { column, row, playerId } = point;
-    let sameRowPoints = [{ row, column }];
+    let sameRowPoints = [point];
     let direction = -1;
     let currentRow = row;
     while (sameRowPoints.length < this.sameRowPointsSize) {
@@ -132,7 +153,7 @@ class Board {
 
   countLeftTop(point) {
     const { column, row, playerId } = point;
-    let sameRowPoints = [{ row, column }];
+    let sameRowPoints = [point];
     let direction = -1;
     let currentColumn = column;
     let currentRow = row;
@@ -159,7 +180,7 @@ class Board {
 
   countRightTop(point) {
     const { column, row, playerId } = point;
-    let sameRowPoints = [{ row, column }];
+    let sameRowPoints = [point];
     let direction = -1;
     let currentColumn = column;
     let currentRow = row;
@@ -276,7 +297,8 @@ class Board {
 
   handleMoved(point) {
     const { currentPlayer, eventHub } = this;
-    if (this.isPlaying && currentPlayer.id === point.playerId && this.isCellAvailable(point)) {
+    const { column, row, playerId } = point;
+    if (this.isPlaying && currentPlayer.id === playerId && this.isMoveAvailable(column, row)) {
       this.processMoved(point);
       this.stackPoint(point);
     }
