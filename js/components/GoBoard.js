@@ -18,10 +18,9 @@ class GoBoard {
 
 
     this.halfCellSize = this.cellSize / 2;
-    this.deltaSize = this.size + 2;
     this.stoneSpaceSize = (this.cellSize - this.stoneSize) / 2;
-    this.height = this.width = this.cellSize * this.deltaSize;
-    this.lineLength = this.width - cellSize;
+    this.height = this.width = this.cellSize * this.size;
+    this.lineLength = this.width;
 
     ctx.canvas.addEventListener('click', (event) => {
       this.handleCellClick.call(this, event);
@@ -44,22 +43,22 @@ class GoBoard {
   }
 
   drawLines() {
-    const { ctx, cellSize, deltaSize, lineLength, boardLineColor, boardLineWith } = this;
+    const { ctx, cellSize, size, lineLength, boardLineColor, boardLineWith } = this;
     ctx.beginPath();
     ctx.strokeStyle = boardLineColor;
     ctx.lineWidth = boardLineWith;
 
     // horizontal lines
-    for (let i = 1; i < deltaSize; i++) {
+    for (let i = 0; i <= size; i++) {
       const y = cellSize * i + 0.5; // add 0.5 to make line more clear
-      ctx.moveTo(cellSize, y);
+      ctx.moveTo(0, y);
       ctx.lineTo(lineLength, y);
     }
 
     // vertical lines
-    for (let j = 1; j < deltaSize; j++) {
+    for (let j = 0; j <= size; j++) {
       const x = cellSize * j + 0.5; // add 0.5 to make line more clear
-      ctx.moveTo(x, cellSize);
+      ctx.moveTo(x, 0);
       ctx.lineTo(x, lineLength);
     }
 
@@ -112,10 +111,8 @@ class GoBoard {
 
   removeCrossLine(stones, stoneType) {
     stones.forEach((stone, index) => {
-      if(stones.length - 1 !== index){
-        this.removeStone(stone.column, stone.row);
-        this.addStone(stone.column, stone.row, stoneType)
-      }
+      this.removeStone(stone.column, stone.row);
+      this.addStone(stone.column, stone.row, stoneType)
     });
   }
 
