@@ -26,7 +26,7 @@ class Board {
     for (let i = 0; i < this.size; i++) {
       this.points[i] = new Array(this.size);
       for (let j = 0; j < this.size; j++) {
-        this.points[i][j] = '';
+        this.points[i][j] = ' ';
       }
     }
 
@@ -63,25 +63,6 @@ class Board {
     return this.sameRowPoints;
   }
 
-  getAvailableMoves() {
-    return Board.findAvailableMoves(this.points);
-  }
-
-  static findAvailableMoves(points) {
-    const moves = [];
-    for (let i = 1; i < points.length; i++) {
-      for (let j = 1; j < points.length; j++) {
-        if (!points[i][j]) {
-          moves.push({
-            row: i,
-            column: j,
-          });
-        }
-      }
-    }
-    return moves;
-  }
-
   addPlayer(player) {
     this.players.push(player);
     player.addMovedListener(this.handleMoved.bind(this));
@@ -93,7 +74,7 @@ class Board {
 
   isMoveAvailable(column, row) {
     /* check whether existed already */
-    return !this.points[row][column];
+    return this.points[row][column] === ' ';
   }
 
   countLeftRight(point) {
@@ -232,7 +213,7 @@ class Board {
   }
 
   removePoint(point) {
-    this.points[point.row][point.column] = '';
+    this.points[point.row][point.column] = ' ';
     this.eventHub.emit('point_remove', point);
   }
 
@@ -246,8 +227,8 @@ class Board {
   }
 
   processMoved(point) {
-    this.addPoint(point);
     this.judgement(point);
+    this.addPoint(point);
   }
 
   stackPoint(point) {

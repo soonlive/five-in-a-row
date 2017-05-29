@@ -5,7 +5,7 @@
 
 const Constants = {
   SAME_ROW_POINTS_SIZE: 5,
-  SIZE: 15,
+  SIZE: 6,
   CELL_SIZE: 38,
   STONE_SIZE: 28,
   STONE_LINE_WITH: 4,
@@ -15,4 +15,11 @@ const Constants = {
   BOARD_LINE_COLOR: '#000000',
   CIRCLE_STONE_COLOR: '#001f90',
   CROSS_STONE_COLOR: '#b00000',
+
+
+
+  // BOARD_BACKGROUND_COLOR: '#ffffff',
+  // BOARD_LINE_COLOR: '#fbfbfb',
+  // CIRCLE_STONE_COLOR: '#eee',
+  // CROSS_STONE_COLOR: '#eee',
 };

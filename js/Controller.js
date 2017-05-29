@@ -34,35 +34,30 @@ class Controller {
     board.setCurrentPlayer(playerI);
 
     view.newRound();
-    //
-    // board.points.forEach((row, index) => {
-    //   for (let i = 0; i < row.length; i++) {
-    //     if (index > 2) {
-    //       board.setCurrentPlayer(playerI);
-    //       playerI.move(i, );
-    //     }
-    //   }
-    // })
-
   }
 
   turnover(player) {
     const { view, board, playerI, playerII } = this;
     const nextPlayer = player === playerI ? playerII : playerI;
     board.setCurrentPlayer(nextPlayer);
-    if (nextPlayer instanceof AIPlayer) {
-      // nextPlayer.setBoard(board);
-      // const move = nextPlayer.think(board.points);
-      // nextPlayer.move(move.column, move.row);
+    if (nextPlayer instanceof Master) {
+      const move = nextPlayer.think(board.points);
+      nextPlayer.move(move.column, move.row);
     }
   }
 
   handleMoved(point) {
+    const self = this;
     const { view, board } = this;
     const { column, row, playerId } = point;
     const player = board.getPlayer(playerId);
     view.addStone(column, row, player.getStoneType());
-    this.turnover(player);
+    // setTimeout(() => {
+      if(!board.hasWinner()){
+        this.turnover(player);
+      }
+    // }, 1000);
+
   }
 
   handleWinNotified(playerId, sameRowStones) {
