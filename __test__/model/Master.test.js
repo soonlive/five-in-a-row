@@ -57,9 +57,18 @@ test('generatePattern', () => {
 
 test('evaluatePattern', () => {
   let master = new Master('x', 'easy', 'o');
-  expect(master.evaluatePattern('ooooo')).toBe(99999);
-  expect(master.evaluatePattern('xoooxx')).toBe(6000);
-  expect(master.evaluatePattern('xxoxo')).toBe(80);
+  let ooooo = master.evaluatePattern('ooooo');
+  let xoooxx = master.evaluatePattern('xoooxx');
+  let oooxxx = master.evaluatePattern('oooxxx');
+  let oxooxx = master.evaluatePattern('oxooxx');
+  let oooxx = master.evaluatePattern('oooxx');
+  let xxoxo = master.evaluatePattern('xxoxo');
+
+  expect(ooooo).toBeGreaterThan(xoooxx);
+  expect(xoooxx).toBeGreaterThan(oxooxx);
+  expect(xoooxx).toBeGreaterThan(oooxx);
+  expect(oooxx).toBeGreaterThan(oxooxx);
+  expect(oooxxx).toBeGreaterThan(oxooxx);
 });
 
 
@@ -79,8 +88,7 @@ test('evaluatePoint', () => {
   expect(pattern).toEqual('xoxx');
   expect(master.evaluatePattern(pattern)).toEqual(0);
   pattern = master.generatePattern(points, 2, 3, 1, 0, master.id);
-  expect(pattern).toEqual('xoooxx');
-  expect(master.evaluatePattern(pattern)).toEqual(6000);
+  expect(master.evaluatePattern(pattern)).toEqual(4500);
   pattern = master.generatePattern(points, 2, 3, 1, 1, master.id);
   expect(pattern).toEqual('xxoxo');
   expect(master.evaluatePattern(pattern)).toEqual(80);
@@ -88,7 +96,7 @@ test('evaluatePoint', () => {
   expect(pattern).toEqual('xxoxx');
   expect(master.evaluatePattern(pattern)).toEqual(40);
   let value = master.evaluatePoint(points, { row: 2, column: 3 }, master.id);
-  expect(value).toBe(6120);
+  expect(value).toBe(4620);
 
 
   points = [
@@ -100,9 +108,9 @@ test('evaluatePoint', () => {
     ['o', 'o', 'o', 'o', 'o', ' '],
   ];
   value = master.evaluatePoint(points, { row: 4, column: 4 }, master.id);
-  expect(value).toBe(6380);
+  expect(value).toBe(4800);
   value = master.evaluatePoint(points, { row: 1, column: 5 }, master.id);
-  expect(value).toBe(3500);
+  expect(value).toBe(2000);
 
 
   points = [
@@ -115,9 +123,9 @@ test('evaluatePoint', () => {
   ];
 
   value = master.evaluatePoint(points, { row: 1, column: 0 }, master.id);
-  expect(value).toBe(5500);
+  expect(value).toBe(4000);
   value = master.evaluatePoint(points, { row: 1, column: 4 }, master.id);
-  expect(value).toBe(5500);
+  expect(value).toBe(4000);
 
 
   points = [
@@ -130,9 +138,9 @@ test('evaluatePoint', () => {
   ];
 
   value = master.evaluatePoint(points, { row: 1, column: 0 }, master.id);
-  expect(value).toBe(5500);
+  expect(value).toBe(4000);
   value = master.evaluatePoint(points, { row: 1, column: 4 }, master.id);
-  expect(value).toBe(5500);
+  expect(value).toBe(4000);
 });
 
 
@@ -150,7 +158,7 @@ test('evaluatePoints', () => {
   ];
 
   let value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(22000);
+  expect(value).toBe(20500);
 
 
   points = [
@@ -163,7 +171,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(4500);
+  expect(value).toBe(4700);
 
 
   points = [
@@ -176,7 +184,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(600);
+  expect(value).toBe(800);
 
   points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -188,7 +196,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(18280);
+  expect(value).toBe(13780);
 
 
   points = [
@@ -200,7 +208,7 @@ test('evaluatePoints', () => {
     ['o', 'o', 'o', 'o', 'o', ' '],
   ];
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(44500);
+  expect(value).toBe(34200);
 
 
   points = [
@@ -213,7 +221,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(18000);
+  expect(value).toBe(9000);
 
 
   points = [
@@ -226,7 +234,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(22000);
+  expect(value).toBe(16000);
 
   points = [
     ['o', 'o', 'o', 'o', 'o', 'o'],
@@ -238,7 +246,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(22000);
+  expect(value).toBe(16000);
 
 });
 
@@ -279,12 +287,12 @@ test('sortMoves', () => {
   console.timeEnd("sortMoves")
   expect(moves[0]).toHaveProperty('row', 1);
   expect(moves[0]).toHaveProperty('column', 4);
-  expect(moves[1]).toHaveProperty('row', 4);
-  expect(moves[1]).toHaveProperty('column', 4);
-  expect(moves[2]).toHaveProperty('row', 0);
-  expect(moves[2]).toHaveProperty('column', 2);
-  expect(moves[3]).toHaveProperty('row', 3);
-  expect(moves[3]).toHaveProperty('column', 3);
+  expect(moves[1]).toHaveProperty('row', 3);
+  expect(moves[1]).toHaveProperty('column', 3);
+  expect(moves[2]).toHaveProperty('row', 4);
+  expect(moves[2]).toHaveProperty('column', 4);
+  expect(moves[3]).toHaveProperty('row', 0);
+  expect(moves[3]).toHaveProperty('column', 2);
 });
 
 test('oooox', () => {
@@ -301,7 +309,7 @@ test('oooox', () => {
   // ];
   let points = [
     ['o', 'o', 'o', 'o', 'o', 'o'],
-    ['x', 'x', 'x', 'x', '√', 'o'],
+    ['x', 'x', 'x', 'x', ' ', 'o'],
     ['o', 'o', 'o', 'o', 'o', 'o'],
     ['o', 'o', 'o', 'o', 'o', 'o'],
     ['o', 'o', 'o', 'o', 'o', 'o'],
@@ -409,15 +417,15 @@ test('minMax', () => {
   let value2 = master.minMax(points, attacker, attacker, defender, {
     row: 2,
     column: 0
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   let value3 = master.minMax(points, attacker, attacker, defender, {
     row: 2,
     column: 3
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   let value4 = master.minMax(points, attacker, attacker, defender, {
     row: 3,
     column: 3
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
 
   expect(value3).toBeGreaterThan(value2);
   expect(value4).toBeGreaterThan(value3);
@@ -435,18 +443,39 @@ test('minMax', () => {
   value2 = master.minMax(points, attacker, attacker, defender, {
     row: 1,
     column: 3
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   value3 = master.minMax(points, attacker, attacker, defender, {
     row: 1,
     column: 1
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   value4 = master.minMax(points, attacker, attacker, defender, {
     row: 4,
     column: 3
-  }, 5, Number.MIN_VALUE, Number.MAX_VALUE);
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   expect(value4).toBeGreaterThan(value2);
   expect(value2).toBeGreaterThan(value3);
 
+
+  points = [
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', 'o', 'x', 'x', 'x', ' '],
+    [' ', ' ', 'o', 'x', ' ', ' '],
+    [' ', ' ', 'o', 'o', 'o', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+  ];
+
+  value2 = master.minMax(points, attacker, attacker, defender, {
+    row: 2,
+    column: 1
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
+  value3 = master.minMax(points, attacker, attacker, defender, {
+    row: 0,
+    column: 3
+  }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
+  console.log('Master.test.js => value2,value3', value2, value3);
+
+  expect(value3).toBeGreaterThan(value2);
 });
 
 
@@ -479,7 +508,7 @@ test('minMax easy vs normal 1', () => {
     column: 3
   }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   console.log('easy value2, value3, value4:', value2, value3, value4);
-  expect(value4).toEqual(value2);
+  expect(value4).toBeGreaterThan(value2);
   expect(value3).toBeGreaterThan(value2);
 
   master = new Master('x', 'normal', 'o');
@@ -529,7 +558,7 @@ test('minMax easy vs normal 2', () => {
     column: 2
   }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   console.log('easy value2, value3:', value2, value3);
-  expect(value2).toBeGreaterThan(value3);
+  expect(value3).toBeGreaterThan(value2);
 
   master = new Master('x', 'normal', 'o');
 
@@ -542,6 +571,6 @@ test('minMax easy vs normal 2', () => {
     column: 2
   }, master.depth, Number.MIN_VALUE, Number.MAX_VALUE);
   console.log('normal value2, value3:', value2, value3);
-  expect(value3).toBeGreaterThan(value2);  // diff from easy
+  expect(value3).toBeGreaterThan(value2);
 
 });

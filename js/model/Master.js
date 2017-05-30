@@ -43,18 +43,19 @@ class Master extends Player {
       'oooxo': 2000,
 
       'xooox': 3000,
-      'xooo': 1500,
-      'ooox': 1500,
+      'xxooo': 1500,
+      'oooxx': 1500,
       'xooxo': 800,
       'xoxoo': 800,
       'ooxox': 800,
       'oxoox': 800,
-      'xoox': 200,
+      'xooxx': 150,
+      'xxoox': 150,
+      'ooxxx': 100,
+      'xxxoo': 100,
       'xxoxx': 40,
-      'oxox': 80,
-      'xoxo': 80,
-      // 'ox': 10,
-      // 'xo': 10,
+      'oxoxx': 80,
+      'xxoxo': 80,
     };
 
   }
@@ -235,7 +236,7 @@ class Master extends Player {
     const moves = this.findAvailableMoves(points);
     const playerId = attacker;
     let max = Number.MIN_VALUE;
-    let bestMoveIndex = null;
+    let bestMoveIndex = 0;
     this.sortMoves(points, moves, playerId);
     const limit = Math.min(moves.length, this.limit);
     for (let i = 0; i < limit; i++) {
