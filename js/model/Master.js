@@ -71,64 +71,69 @@ class Master extends Player {
     const moves = this.findAvailableMoves(copyPoints);
 
     // no more move is available, match end
-    //
     if (moves.length < 1) {
-      return this.evaluatePoints(copyPoints, playerId);
-    } else if (moves.length > 1) {
-      this.sortMoves(points, moves, playerId);
+      return this.evaluatePoints(copyPoints, attacker);
     }
 
-    const limit = Math.min(moves.length, this.limit);
     if (playerId === attacker) {
+      this.sortMoves(points, moves, attacker);
+      const limit = Math.min(moves.length, this.limit);
+      let bestValue = Number.MIN_VALUE;
       for (let i = 0; i < limit; i++) {
-        const value = this.minMax(copyPoints, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
-        alpha = Math.max(alpha, value);
+        bestValue = this.minMax(copyPoints, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
+        alpha = Math.max(alpha, bestValue);
         if (alpha >= beta)
           break;
       }
-      return alpha;
+      return bestValue;
     } else {
+      this.sortMoves(points, moves, attacker, true);
+      const limit = Math.min(moves.length, this.limit);
+      let bestValue = Number.MAX_VALUE;
       for (let i = 0; i < limit; i++) {
-        const value = this.minMax(copyPoints, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
-        beta = Math.min(beta, value);
+        bestValue = this.minMax(copyPoints, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
+        beta = Math.min(beta, bestValue);
         if (alpha >= beta)
           break;
       }
-      return beta;
+      return bestValue;
     }
   }
 
-  sortMoves(points, moves, playerId) {
+  sortMoves(points, moves, playerId, reserve = false) {
     let valMap = new Map();
     let curKey;
     let nextKey;
     let curVal;
     let nextVal;
+    let direction = reserve ? -1 : 1;
     moves.sort((cur, next) => {
       curKey = `${cur.row}-${cur.column}`;
       nextKey = `${next.row}-${next.column}`;
+      curVal = 0;
+      nextVal = 0;
       if (valMap.has(curKey)) {
         curVal = valMap.get(curKey);
       } else {
-        curVal = this.evaluatePoint(points, cur, playerId);
+        curVal += this.evaluatePoint(points, cur, playerId);
         valMap.set(curKey, curVal);
       }
       if (valMap.has(nextKey)) {
         nextVal = valMap.get(nextKey);
       } else {
-        nextVal = this.evaluatePoint(points, next, playerId);
+        nextVal += this.evaluatePoint(points, next, playerId);
         valMap.set(nextKey, nextVal);
       }
-      return curVal < nextVal ? 1 : curVal === nextVal ? 0 : -1;
+      return (curVal < nextVal ? 1 : curVal === nextVal ? 0 : -1) * direction;
     })
   }
 
-  evaluatePoints(points, playerId) {
+  evaluatePoints(points, attacker) {
     let totalValue = 0;
     for (let i = 0; i < points.length; i++) {
       for (let j = 0; j < points[i].length; j++) {
-        if (points[i][j] === playerId) {
-          totalValue += this.evaluatePoint(points, { row: i, column: j }, playerId);
+        if (points[i][j] === attacker) {
+          totalValue += this.evaluatePoint(points, { row: i, column: j }, attacker);
         }
       }
     }
@@ -234,15 +239,14 @@ class Master extends Player {
 
   findBestMove(points, attacker, defender) {
     const moves = this.findAvailableMoves(points);
-    const playerId = attacker;
     let max = Number.MIN_VALUE;
     let bestMoveIndex = 0;
-    this.sortMoves(points, moves, playerId);
-    const limit = Math.min(moves.length, this.limit);
-    for (let i = 0; i < limit; i++) {
+    // this.sortMoves(points, moves, attacker);
+    // const limit = Math.min(moves.length, this.limit);
+    for (let i = 0; i < moves.length; i++) {
       let move = moves[i];
-      const value = this.minMax(points, playerId, attacker, defender, move, this.depth, Number.MIN_VALUE, Number.MAX_VALUE);
-
+      let value = this.minMax(points, attacker, attacker, defender, move, this.depth, Number.MIN_VALUE, Number.MAX_VALUE);
+      value += this.minMax(points, defender, defender, attacker, move, this.depth, Number.MIN_VALUE, Number.MAX_VALUE);
       if (value > max) {
         max = value;
         bestMoveIndex = i;
