@@ -11,12 +11,12 @@ class Master extends Player {
 
     switch (level) {
       case 'normal':
-        this.depth = 8;
-        this.limit = 5;
+        this.depth = 5;
+        this.limit = 8;
         break;
       case 'hard':
-        this.depth = 16;
-        this.limit = 7;
+        this.depth = 8;
+        this.limit = 16;
         break;
       case 'easy':
       default:
@@ -68,7 +68,8 @@ class Master extends Player {
 
     const copyPoints = JSON.parse(JSON.stringify(points));
     copyPoints[move.row][move.column] = playerId;
-    const moves = this.findAvailableMoves(copyPoints);
+    const moves = this.generateLegalMoves(copyPoints, attacker, defender);
+    const limit = Math.min(moves.length, this.limit);
 
     // no more move is available, match end
     if (moves.length < 1) {
@@ -76,9 +77,7 @@ class Master extends Player {
     }
 
     if (playerId === attacker) {
-      this.sortMoves(points, moves, attacker);
-      const limit = Math.min(moves.length, this.limit);
-      let bestValue = Number.MIN_VALUE;
+      let bestValue = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
         bestValue = this.minMax(copyPoints, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
         alpha = Math.max(alpha, bestValue);
@@ -87,9 +86,7 @@ class Master extends Player {
       }
       return bestValue;
     } else {
-      this.sortMoves(points, moves, attacker, true);
-      const limit = Math.min(moves.length, this.limit);
-      let bestValue = Number.MAX_VALUE;
+      let bestValue = Number.POSITIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
         bestValue = this.minMax(copyPoints, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
         beta = Math.min(beta, bestValue);
@@ -115,13 +112,13 @@ class Master extends Player {
       if (valMap.has(curKey)) {
         curVal = valMap.get(curKey);
       } else {
-        curVal += this.evaluatePoint(points, cur, playerId);
+        curVal = this.evaluatePoint(points, cur, playerId);
         valMap.set(curKey, curVal);
       }
       if (valMap.has(nextKey)) {
         nextVal = valMap.get(nextKey);
       } else {
-        nextVal += this.evaluatePoint(points, next, playerId);
+        nextVal = this.evaluatePoint(points, next, playerId);
         valMap.set(nextKey, nextVal);
       }
       return (curVal < nextVal ? 1 : curVal === nextVal ? 0 : -1) * direction;
@@ -168,6 +165,145 @@ class Master extends Player {
     return totalValue;
   }
 
+  generateLegalMoves(points, playerI, playerII) {
+    let ooooo = [];
+    let oooo = [];
+    let ooo = [];
+    let oo = [];
+    let o = [];
+    let x = [];
+
+    for (let i = 0; i < points.length; i++) {
+      for (let j = 0; j < points[i].length; j++) {
+        if (points[i][j] !== ' ') {
+          continue;
+        }
+
+        if (this.hasNeighbour(points, i, j)) {
+          let patternI = playerI && this.generateMaxLegalPattern(points, i, j, playerI);
+          let patternII = playerII && this.generateMaxLegalPattern(points, i, j, playerII);
+
+          if ('ooooo' === patternI || 'ooooo' === patternII) {
+            return [{ row: i, column: j }];
+          }
+
+          if ('oooo' === patternI || 'oooo' === patternII) {
+            oooo.push({ row: i, column: j });
+          } else if ('ooo' === patternI || 'ooo' === patternII) {
+            ooo.push({ row: i, column: j });
+          } else if ('oo' === patternI || 'oo' === patternII) {
+            o.push({ row: i, column: j });
+          } else if ('o' === patternI || 'o' === patternII) {
+            o.push({ row: i, column: j });
+          } else {
+            x.push({ row: i, column: j });
+          }
+        }
+      }
+    }
+
+    if (oooo.length > 0) {
+      return oooo;
+    }
+
+
+    if (ooo.length > 0) {
+      return ooo;
+    }
+
+    return oo.concat(o).concat(x);
+  }
+
+  hasNeighbour(points, row, column) {
+
+    // west
+    if (points[row][column + 1] && points[row][column + 1] !== ' ') {
+      return true;
+    }
+    // east
+    if (points[row][column - 1] && points[row][column - 1] !== ' ') {
+      return true;
+    }
+    // north
+    if (points[row - 1] && points[row - 1][column] && points[row - 1][column] !== ' ') {
+      return true;
+    }
+
+    // south
+    if (points[row + 1] && points[row + 1][column] && points[row + 1][column] !== ' ') {
+      return true;
+    }
+
+    // east south
+    if (points[row + 1] && points[row + 1][column + 1] && points[row + 1][column + 1] !== ' ') {
+      return true;
+    }
+
+    // west south
+    if (points[row + 1] && points[row + 1][column - 1] && points[row + 1][column - 1] !== ' ') {
+      return true;
+    }
+
+    // west north
+    if (points[row - 1] && points[row - 1][column - 1] && points[row - 1][column - 1] !== ' ') {
+      return true;
+    }
+
+    // east north
+    if (points[row - 1] && points[row - 1][column + 1] && points[row - 1][column + 1] !== ' ') {
+      return true;
+    }
+  }
+
+  generateLegalPattern(pattern) {
+    if (pattern.length < 5) {
+      return '';
+    }
+
+    if (pattern.indexOf('ooooo') > -1) {
+      return 'ooooo';
+    } else if (pattern.indexOf('oooo') > -1) {
+      return 'oooo';
+    } else if (pattern.indexOf('ooo') > -1) {
+      return 'ooo';
+    } else if (pattern.indexOf('oo') > -1) {
+      return 'oo';
+    } else if (pattern.indexOf('o') > -1) {
+      return 'o';
+    } else {
+      return '';
+    }
+  }
+
+  generateMaxLegalPattern(points, row, column, playerId) {
+    let max;
+    //  direction: -
+    let patternH = this.generatePattern(points, row, column, 0, 1, playerId);
+    max = this.generateLegalPattern(patternH);
+
+    //  direction: |
+    let patternV = this.generatePattern(points, row, column, 1, 0, playerId);
+    patternV = this.generateLegalPattern(patternV);
+    if (max.length < patternV.length) {
+      max = patternV;
+    }
+
+    //  direction: \
+    let patternLT = this.generatePattern(points, row, column, 1, 1, playerId);
+    patternLT = this.generateLegalPattern(patternLT);
+    if (max.length < patternLT.length) {
+      max = patternLT;
+    }
+
+    //  direction: /
+    let patternRT = this.generatePattern(points, row, column, -1, 1, playerId);
+    patternRT = this.generateLegalPattern(patternRT);
+    if (max.length < patternRT.length) {
+      max = patternRT;
+    }
+
+    return max;
+  }
 
   /**
    * directions:
@@ -238,15 +374,16 @@ class Master extends Player {
   }
 
   findBestMove(points, attacker, defender) {
-    const moves = this.findAvailableMoves(points);
-    let max = Number.MIN_VALUE;
+    let max = Number.NEGATIVE_INFINITY;
     let bestMoveIndex = 0;
-    // this.sortMoves(points, moves, attacker);
-    // const limit = Math.min(moves.length, this.limit);
-    for (let i = 0; i < moves.length; i++) {
+    const moves = this.generateLegalMoves(points, attacker, defender);
+    const limit = Math.min(moves.length, this.limit);
+    for (let i = 0; i < limit; i++) {
       let move = moves[i];
-      let value = this.minMax(points, attacker, attacker, defender, move, this.depth, Number.MIN_VALUE, Number.MAX_VALUE);
-      value += this.minMax(points, defender, defender, attacker, move, this.depth, Number.MIN_VALUE, Number.MAX_VALUE);
+
+      let value = this.minMax(points, attacker, attacker, defender, move, this.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+      value += this.minMax(points, defender, defender, attacker, move, this.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+
       if (value > max) {
         max = value;
         bestMoveIndex = i;

@@ -5,7 +5,7 @@
 class App {
   constructor() {
     this.playerI = new Player('o');
-    this.playerII = new Master('x', 'easy', 'o');
+    this.playerII = new Master('x', 'normal', 'o');
 
     this.board = new Board(Constants.SIZE, Constants.SAME_ROW_POINTS_SIZE);
     this.view = new View();
