@@ -15,6 +15,7 @@ open ./index.html
 or live: [https://soonlive.github.io/five-in-a-row/](https://soonlive.github.io/five-in-a-row/)
 
 ## Algorithm
-- [Minimax](https://en.wikipedia.org/wiki/Minimax)
-- [Alpha–beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
-- [Heuristic](https://en.wikipedia.org/wiki/Killer_heuristic)
+- [x] [Minimax](https://en.wikipedia.org/wiki/Minimax)
+- [x] [Alpha–beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+- [x] [Heuristic](https://en.wikipedia.org/wiki/Killer_heuristic)
+- [ ] Transposition Tables
