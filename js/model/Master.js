@@ -85,33 +85,34 @@ class Master extends Player {
       return this.evaluatePoints(points, attacker);
     }
 
-    const copyPoints = JSON.parse(JSON.stringify(points));
-    copyPoints[move.row][move.column] = playerId;
-    const moves = this.generateLegalMoves(copyPoints, attacker, defender);
+    points[move.row][move.column] = playerId;
+    const moves = this.generateLegalMoves(points, attacker, defender);
     const limit = Math.min(moves.length, this.limit);
 
     // no more move is available, match end
     if (moves.length < 1) {
-      return this.evaluatePoints(copyPoints, attacker);
+      return this.evaluatePoints(points, attacker);
     }
 
     if (playerId === attacker) {
       let bestValue = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
-        bestValue = this.minMax(copyPoints, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
+        bestValue = this.minMax(points, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
         alpha = Math.max(alpha, bestValue);
         if (alpha >= beta)
           break;
       }
+      points[move.row][move.column] = ' ';
       return bestValue;
     } else {
       let bestValue = Number.POSITIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
-        bestValue = this.minMax(copyPoints, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
+        bestValue = this.minMax(points, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
         beta = Math.min(beta, bestValue);
         if (alpha >= beta)
           break;
       }
+      points[move.row][move.column] = ' ';
       return bestValue;
     }
   }
