@@ -3,11 +3,17 @@
  */
 
 class Controller {
-  constructor(view, board, playerI, playerII) {
+  constructor(view, board) {
     this.view = view;   // view obj
-    this.board = board; // this is a model obj, not a view obj, diff from
-    this.playerI = playerI;
-    this.playerII = playerII;
+    this.board = board; // this is a model obj, not a view obj
+    this.playerI = new Player({
+      id: 'o',
+    });
+    this.playerII = new Master({
+      id: 'x',
+      level: 'normal',
+      opponentId: 'o',
+    });
   }
 
   init() {

@@ -4,10 +4,10 @@
 
 class Master extends Player {
 
-  constructor(id, level, opponentId) {
-    super(id);
+  constructor({ id, level, opponentId }) {
+    super({ id });
 
-    this.level = level;
+    this.setLevel(level);
 
     switch (level) {
       case 'normal':
@@ -58,6 +58,25 @@ class Master extends Player {
       'xxoxo': 80,
     };
 
+  }
+
+  setLevel(level) {
+    this.level = level;
+    switch (level) {
+      case 'hard':
+        this.depth = 8;
+        this.limit = 16;
+        break;
+      case 'easy':
+        this.depth = 3;
+        this.limit = 4;
+        break;
+      case 'normal':
+      default:
+        this.depth = 5;
+        this.limit = 8;
+        break;
+    }
   }
 
   minMax(points, playerId, attacker, defender, move, depth, alpha, beta) {
@@ -179,7 +198,7 @@ class Master extends Player {
           continue;
         }
 
-        if (this.hasNeighbour(points, i, j)) {
+        if (this.hasAdjacent(points, i, j)) {
           let patternI = playerI && this.generateMaxLegalPattern(points, i, j, playerI);
           let patternII = playerII && this.generateMaxLegalPattern(points, i, j, playerII);
 
@@ -214,7 +233,7 @@ class Master extends Player {
     return oo.concat(o).concat(x);
   }
 
-  hasNeighbour(points, row, column) {
+  hasAdjacent(points, row, column) {
 
     // west
     if (points[row][column + 1] && points[row][column + 1] !== ' ') {

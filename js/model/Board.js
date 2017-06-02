@@ -77,125 +77,75 @@ class Board {
     return this.points[row][column] === ' ';
   }
 
-  countLeftRight(point) {
-    const { column, row, playerId } = point;
+  /**
+   * directions:
+   *  - :
+   *    rowStep: 0
+   *    columnStep: 1
+   *  | :
+   *    rowStep: 1
+   *    columnStep: 0
+   *  \ :
+   *    rowStep: 1
+   *    columnStep: 1
+   *  / :
+   *    rowStep: -1
+   *    columnStep: 1
+   *
+   * @param points
+   * @param point
+   * @param rowStep
+   * @param columnStep
+   * @returns {Array}
+   */
+  searchSameRowPoints(point, rowStep, columnStep) {
+    let { row, column, playerId } = point;
     let sameRowPoints = [point];
-    let direction = -1;
-    let currentColumn = column;
-    while (sameRowPoints.length < this.sameRowPointsSize) {
-      currentColumn += direction;
-      if (this.points[row][currentColumn] === playerId) {
-        const targetPoint = new Point(currentColumn, row, playerId);
-        if (direction === -1) {
-          sameRowPoints.unshift(targetPoint);
-        } else {
-          sameRowPoints.push(targetPoint);
-        }
-      } else if (direction === -1) {
-        direction = 1;
-        currentColumn = column;
-      } else {
-        break;
-      }
-    }
-    return sameRowPoints;
-  }
 
-  countUpDown(point) {
-    const { column, row, playerId } = point;
-    let sameRowPoints = [point];
-    let direction = -1;
-    let currentRow = row;
-    while (sameRowPoints.length < this.sameRowPointsSize) {
-      currentRow += direction;
-      if (this.points[currentRow] && this.points[currentRow][column] === playerId) {
-        const targetPoint = new Point(column, currentRow, playerId);
-        if (direction === -1) {
-          sameRowPoints.unshift(targetPoint);
-        } else {
-          sameRowPoints.push(targetPoint);
-        }
-      } else if (direction === -1) {
-        direction = 1;
-        currentRow = row;
-      } else {
-        break;
-      }
-    }
-    return sameRowPoints;
-  }
+    for (let i = 1; i <= 4; i++) {
+      let currentRow = row - rowStep * i;
+      let currentColumn = column - columnStep * i;
 
-  countLeftTop(point) {
-    const { column, row, playerId } = point;
-    let sameRowPoints = [point];
-    let direction = -1;
-    let currentColumn = column;
-    let currentRow = row;
-    while (sameRowPoints.length < this.sameRowPointsSize) {
-      currentColumn += direction;
-      currentRow += direction;
       if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
         const targetPoint = new Point(currentColumn, currentRow, playerId);
-        if (direction === -1) {
-          sameRowPoints.unshift(targetPoint);
-        } else {
-          sameRowPoints.push(targetPoint);
-        }
-      } else if (direction === -1) {
-        direction = 1;
-        currentColumn = column;
-        currentRow = row;
+        sameRowPoints.unshift(targetPoint);
       } else {
         break;
       }
     }
-    return sameRowPoints;
-  }
 
-  countRightTop(point) {
-    const { column, row, playerId } = point;
-    let sameRowPoints = [point];
-    let direction = -1;
-    let currentColumn = column;
-    let currentRow = row;
-    while (sameRowPoints.length < this.sameRowPointsSize) {
-      currentColumn += direction;
-      currentRow -= direction;
+    for (let i = 1; i <= 4; i++) {
+      let currentRow = row + rowStep * i;
+      let currentColumn = column + columnStep * i;
       if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
         const targetPoint = new Point(currentColumn, currentRow, playerId);
-        if (direction === -1) {
-          sameRowPoints.unshift(targetPoint);
-        } else {
-          sameRowPoints.push(targetPoint);
-        }
-      } else if (direction === -1) {
-        direction = 1;
-        currentColumn = column;
-        currentRow = row;
+        sameRowPoints.push(targetPoint);
       } else {
         break;
       }
     }
+
     return sameRowPoints;
   }
 
+  searchSameRowPointsWithLimitSize(point, size) {
 
-  findSameRowPoints(point) {
-    let sameRowPoints = this.countLeftRight(point);
-
-    if (sameRowPoints.length < this.sameRowPointsSize) {
-      sameRowPoints = this.countUpDown(point);
+    //  direction: -
+    let sameRowPoints = this.searchSameRowPoints(point, 0, 1);
+    //  direction: |
+    if (sameRowPoints.length < size) {
+      sameRowPoints = this.searchSameRowPoints(point, 1, 0);
+    }
+    //  direction: \
+    if (sameRowPoints.length < size) {
+      sameRowPoints = this.searchSameRowPoints(point, 1, 1);
+    }
+    //  direction: /
+    if (sameRowPoints.length < size) {
+      sameRowPoints = this.searchSameRowPoints(point, -1, 1);
     }
 
-    if (sameRowPoints.length < this.sameRowPointsSize) {
-      sameRowPoints = this.countLeftTop(point);
-    }
-
-    if (sameRowPoints.length < this.sameRowPointsSize) {
-      sameRowPoints = this.countRightTop(point);
-    }
-
-    return sameRowPoints;
+    return sameRowPoints.length >= size ? sameRowPoints : null;
   }
 
   notifyWin(playerId, sameRowPoints) {
@@ -217,17 +167,17 @@ class Board {
     this.eventHub.emit('point_remove', point);
   }
 
-  judgement(point) {
+  evaluate(point) {
     const { column, row, playerId } = point;
-    const sameRowPoints = this.findSameRowPoints(point);
+    const sameRowPoints = this.searchSameRowPointsWithLimitSize(point, this.sameRowPointsSize);
 
-    if (sameRowPoints.length >= this.sameRowPointsSize) {
+    if (sameRowPoints) {
       this.notifyWin(playerId, sameRowPoints);
     }
   }
 
   processMoved(point) {
-    this.judgement(point);
+    this.evaluate(point);
     this.addPoint(point);
   }
 

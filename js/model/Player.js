@@ -3,7 +3,7 @@
  */
 
 class Player {
-  constructor(id) {
+  constructor({ id }) {
     this.id = id;
     this.eventHub = new EventHub();
   }

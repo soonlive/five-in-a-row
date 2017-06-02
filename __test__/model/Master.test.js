@@ -2,7 +2,12 @@
  * Created by Xin on 28/05/2017.
  */
 test('generatePattern', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
 
   let points = [
     [' ', ' ', 'o', '√', ' ', ' '],
@@ -55,7 +60,11 @@ test('generatePattern', () => {
 });
 
 test('generateMaxLegalPattern', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+  });
 
   let points = [
     [" ", " ", " ", " ", " ", " "],
@@ -99,7 +108,12 @@ test('generateMaxLegalPattern', () => {
 });
 
 test('evaluatePattern', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let ooooo = master.evaluatePattern('ooooo');
   let xoooxx = master.evaluatePattern('xoooxx');
   let oooxxx = master.evaluatePattern('oooxxx');
@@ -116,7 +130,12 @@ test('evaluatePattern', () => {
 
 
 test('evaluatePoint', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
 
   let points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -188,7 +207,12 @@ test('evaluatePoint', () => {
 
 
 test('evaluatePoints', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
 
 
   let points = [
@@ -295,7 +319,12 @@ test('evaluatePoints', () => {
 
 
 test('findAvailableMoves', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let points = [
     [' ', 'x', 'o'],
     ['x', 'x', ' '],
@@ -312,7 +341,12 @@ test('findAvailableMoves', () => {
 
 test('sortMoves', () => {
 
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
   let moves = [];
@@ -359,7 +393,12 @@ test('sortMoves', () => {
 });
 
 test('oooox', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
   // let points = [
@@ -434,7 +473,12 @@ test('oooox', () => {
 
 
 test('xooox', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
   let points = [
@@ -464,7 +508,12 @@ test('xooox', () => {
 
 
 test('minMax', () => {
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
 
@@ -561,8 +610,18 @@ test('minMax', () => {
 
 
 test('minMax easy vs normal 1', () => {
-  let master = new Master('x', 'easy', 'o');
-  let normalMaster = new Master('x', 'normal', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
+  let normalMaster = new Master({
+    id: 'x',
+    level: 'normal',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
 
@@ -627,7 +686,12 @@ test('minMax easy vs normal 2', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  let master = new Master('x', 'easy', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let value2 = master.minMax(points, attacker, attacker, defender, {
     row: 2,
     column: 4
@@ -638,7 +702,12 @@ test('minMax easy vs normal 2', () => {
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
   expect(value3).toBeGreaterThan(value2);
 
-  master = new Master('x', 'normal', 'o');
+  master = new Master({
+    id: 'x',
+    level: 'normal',
+    opponentId: 'o',
+
+  });
 
   value2 = master.minMax(points, attacker, attacker, defender, {
     row: 2,
@@ -653,7 +722,12 @@ test('minMax easy vs normal 2', () => {
 });
 
 test('generateLegalMoves', () => {
-  let master = new Master('x', 'normal', 'o');
+  let master = new Master({
+    id: 'x',
+    level: 'normal',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
 
@@ -673,8 +747,18 @@ test('generateLegalMoves', () => {
 });
 
 test('findBestMove normal vs hard', () => {
-  let normalMaster = new Master('x', 'normal', 'o');
-  let hardMaster = new Master('x', 'hard', 'o');
+  let normalMaster = new Master({
+    id: 'x',
+    level: 'normal',
+    opponentId: 'o',
+
+  });
+  let hardMaster = new Master({
+    id: 'x',
+    level: 'hard',
+    opponentId: 'o',
+
+  });
   let attacker = 'x';
   let defender = 'o';
   let points = [
