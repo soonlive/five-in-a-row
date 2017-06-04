@@ -17,7 +17,7 @@ class Player {
   }
 
   move(column, row) {
-    const point = new Point(column, row, this.id);
+    const point = new Point(row, column, this.id);
     this.eventHub.emit('moved', point);
   }
 

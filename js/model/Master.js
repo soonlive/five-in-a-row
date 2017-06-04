@@ -9,22 +9,6 @@ class Master extends Player {
 
     this.setLevel(level);
 
-    switch (level) {
-      case 'normal':
-        this.depth = 5;
-        this.limit = 8;
-        break;
-      case 'hard':
-        this.depth = 8;
-        this.limit = 16;
-        break;
-      case 'easy':
-      default:
-        this.depth = 3;
-        this.limit = 4;
-        break;
-    }
-
     this.opponentId = opponentId;
 
     this.scores = {
@@ -64,7 +48,7 @@ class Master extends Player {
     this.level = level;
     switch (level) {
       case 'hard':
-        this.depth = 8;
+        this.depth = 7;
         this.limit = 16;
         break;
       case 'easy':
@@ -79,25 +63,25 @@ class Master extends Player {
     }
   }
 
-  minMax(points, playerId, attacker, defender, move, depth, alpha, beta) {
+  minMax(points, playerId, move, depth, alpha, beta) {
 
     if (depth <= 0) {
-      return this.evaluatePoints(points, attacker);
+      return this.evaluatePoints(points);
     }
 
     points[move.row][move.column] = playerId;
-    const moves = this.generateLegalMoves(points, attacker, defender);
+    const moves = this.generateLegalMoves(points);
     const limit = Math.min(moves.length, this.limit);
 
     // no more move is available, match end
     if (moves.length < 1) {
-      return this.evaluatePoints(points, attacker);
+      return this.evaluatePoints(points);
     }
 
-    if (playerId === attacker) {
+    if (playerId === this.id) {
       let bestValue = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
-        bestValue = this.minMax(points, defender, attacker, defender, moves[i], depth - 1, alpha, beta);
+        bestValue = this.minMax(points, this.opponentId, moves[i], depth - 1, alpha, beta);
         alpha = Math.max(alpha, bestValue);
         if (alpha >= beta)
           break;
@@ -107,7 +91,7 @@ class Master extends Player {
     } else {
       let bestValue = Number.POSITIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
-        bestValue = this.minMax(points, attacker, attacker, defender, moves[i], depth - 1, alpha, beta);
+        bestValue = this.minMax(points, this.id, moves[i], depth - 1, alpha, beta);
         beta = Math.min(beta, bestValue);
         if (alpha >= beta)
           break;
@@ -117,59 +101,33 @@ class Master extends Player {
     }
   }
 
-  sortMoves(points, moves, playerId, reserve = false) {
-    let valMap = new Map();
-    let curKey;
-    let nextKey;
-    let curVal;
-    let nextVal;
-    let direction = reserve ? -1 : 1;
-    moves.sort((cur, next) => {
-      curKey = `${cur.row}-${cur.column}`;
-      nextKey = `${next.row}-${next.column}`;
-      curVal = 0;
-      nextVal = 0;
-      if (valMap.has(curKey)) {
-        curVal = valMap.get(curKey);
-      } else {
-        curVal = this.evaluatePoint(points, cur, playerId);
-        valMap.set(curKey, curVal);
-      }
-      if (valMap.has(nextKey)) {
-        nextVal = valMap.get(nextKey);
-      } else {
-        nextVal = this.evaluatePoint(points, next, playerId);
-        valMap.set(nextKey, nextVal);
-      }
-      return (curVal < nextVal ? 1 : curVal === nextVal ? 0 : -1) * direction;
-    })
-  }
-
-  evaluatePoints(points, attacker) {
+  evaluatePoints(points) {
     let totalValue = 0;
     for (let i = 0; i < points.length; i++) {
       for (let j = 0; j < points[i].length; j++) {
-        if (points[i][j] === attacker) {
-          totalValue += this.evaluatePoint(points, { row: i, column: j }, attacker);
+        if (points[i][j] === this.id) {
+          totalValue += this.evaluatePoint(points, i, j, this.id);
+        } else if (points[i][j] === this.opponentId) {
+          totalValue -= this.evaluatePoint(points, i, j, this.opponentId);
         }
       }
     }
     return totalValue;
   }
 
-  evaluatePoint(points, move, playerId) {
+  evaluatePoint(points, row, column, playerId) {
     let totalValue = 0;
     //  direction: -
-    let pattern = this.generatePattern(points, move.row, move.column, 0, 1, playerId);
+    let pattern = this.generatePattern(points, row, column, 0, 1, playerId);
     totalValue += this.evaluatePattern(pattern);
     //  direction: |
-    pattern = this.generatePattern(points, move.row, move.column, 1, 0, playerId);
+    pattern = this.generatePattern(points, row, column, 1, 0, playerId);
     totalValue += this.evaluatePattern(pattern);
     //  direction: \
-    pattern = this.generatePattern(points, move.row, move.column, 1, 1, playerId);
+    pattern = this.generatePattern(points, row, column, 1, 1, playerId);
     totalValue += this.evaluatePattern(pattern);
     //  direction: /
-    pattern = this.generatePattern(points, move.row, move.column, -1, 1, playerId);
+    pattern = this.generatePattern(points, row, column, -1, 1, playerId);
     totalValue += this.evaluatePattern(pattern);
     return totalValue;
   }
@@ -185,7 +143,7 @@ class Master extends Player {
     return totalValue;
   }
 
-  generateLegalMoves(points, playerI, playerII) {
+  generateLegalMoves(points) {
     let ooooo = [];
     let oooo = [];
     let ooo = [];
@@ -200,23 +158,23 @@ class Master extends Player {
         }
 
         if (this.hasAdjacent(points, i, j)) {
-          let patternI = playerI && this.generateMaxLegalPattern(points, i, j, playerI);
-          let patternII = playerII && this.generateMaxLegalPattern(points, i, j, playerII);
+          let patternI = this.generateMaxLegalPattern(points, i, j, this.id);
+          let patternII = this.generateMaxLegalPattern(points, i, j, this.opponentId);
 
           if ('ooooo' === patternI || 'ooooo' === patternII) {
-            return [{ row: i, column: j }];
+            return [new Move(i, j)];
           }
 
           if ('oooo' === patternI || 'oooo' === patternII) {
-            oooo.push({ row: i, column: j });
+            oooo.push(new Move(i, j));
           } else if ('ooo' === patternI || 'ooo' === patternII) {
-            ooo.push({ row: i, column: j });
+            ooo.push(new Move(i, j));
           } else if ('oo' === patternI || 'oo' === patternII) {
-            o.push({ row: i, column: j });
+            o.push(new Move(i, j));
           } else if ('o' === patternI || 'o' === patternII) {
-            o.push({ row: i, column: j });
+            o.push(new Move(i, j));
           } else {
-            x.push({ row: i, column: j });
+            x.push(new Move(i, j));
           }
         }
       }
@@ -378,31 +336,15 @@ class Master extends Player {
     return pattern;
   }
 
-  findAvailableMoves(points) {
-    const moves = [];
-    for (let i = 0; i < points.length; i++) {
-      for (let j = 0; j < points.length; j++) {
-        if (points[i][j] === ' ') {
-          moves.push({
-            row: i,
-            column: j,
-          });
-        }
-      }
-    }
-    return moves;
-  }
-
-  findBestMove(points, attacker, defender) {
+  findBestMove(points) {
     let max = Number.NEGATIVE_INFINITY;
     let bestMoveIndex = 0;
-    const moves = this.generateLegalMoves(points, attacker, defender);
+    const moves = this.generateLegalMoves(points);
     const limit = Math.min(moves.length, this.limit);
     for (let i = 0; i < limit; i++) {
       let move = moves[i];
 
-      let value = this.minMax(points, attacker, attacker, defender, move, this.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-      value += this.minMax(points, defender, defender, attacker, move, this.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+      let value = this.minMax(points, this.id, move, this.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
 
       if (value > max) {
         max = value;
@@ -413,7 +355,7 @@ class Master extends Player {
   }
 
   think(points) {
-    const bestMove = this.findBestMove(points, this.id, this.opponentId);
+    const bestMove = this.findBestMove(points);
     return bestMove;
   }
 }

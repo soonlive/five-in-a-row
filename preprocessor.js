@@ -4,6 +4,7 @@
 const fs = require('fs');
 eval(fs.readFileSync('./js/Constants.js')+';global.Constants = Constants;');
 eval(fs.readFileSync('./js/EventHub.js')+';global.EventHub = EventHub;');
+eval(fs.readFileSync('./js/model/Move.js')+';global.Move = Move;');
 eval(fs.readFileSync('./js/model/Point.js')+';global.Point = Point;');
 eval(fs.readFileSync('./js/model/Player.js')+';global.Player = Player;');
 eval(fs.readFileSync('./js/model/Master.js')+';global.Master = Master;');

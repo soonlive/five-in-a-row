@@ -146,18 +146,18 @@ test('evaluatePoint', () => {
     ['o', 'o', 'o', ' ', ' ', ' '],
   ];
 
-  let pattern = master.generatePattern(points, 2, master.depth, 0, 1, master.id);
+  let pattern = master.generatePattern(points, 2, 3, 0, 1, master.id);
   expect(pattern).toEqual('xoxx');
   expect(master.evaluatePattern(pattern)).toEqual(0);
-  pattern = master.generatePattern(points, 2, master.depth, 1, 0, master.id);
+  pattern = master.generatePattern(points, 2, 3, 1, 0, master.id);
   expect(master.evaluatePattern(pattern)).toEqual(4500);
-  pattern = master.generatePattern(points, 2, master.depth, 1, 1, master.id);
+  pattern = master.generatePattern(points, 2, 3, 1, 1, master.id);
   expect(pattern).toEqual('xxoxo');
   expect(master.evaluatePattern(pattern)).toEqual(80);
-  pattern = master.generatePattern(points, 2, master.depth, 1, -1, master.id);
+  pattern = master.generatePattern(points, 2, 3, 1, -1, master.id);
   expect(pattern).toEqual('xxoxx');
   expect(master.evaluatePattern(pattern)).toEqual(40);
-  let value = master.evaluatePoint(points, { row: 2, column: 3 }, master.id);
+  let value = master.evaluatePoint(points, 2, 3, master.id);
   expect(value).toBe(4620);
 
 
@@ -169,9 +169,9 @@ test('evaluatePoint', () => {
     ['o', 'o', ' ', 'o', ' ', 'o'],
     ['o', 'o', 'o', 'o', 'o', ' '],
   ];
-  value = master.evaluatePoint(points, { row: 4, column: 4 }, master.id);
+  value = master.evaluatePoint(points, 4, 4, master.id);
   expect(value).toBe(4800);
-  value = master.evaluatePoint(points, { row: 1, column: 5 }, master.id);
+  value = master.evaluatePoint(points, 1, 5, master.id);
   expect(value).toBe(2000);
 
 
@@ -184,9 +184,9 @@ test('evaluatePoint', () => {
     ['o', 'o', 'o', 'o', 'o', 'o'],
   ];
 
-  value = master.evaluatePoint(points, { row: 1, column: 0 }, master.id);
+  value = master.evaluatePoint(points, 1, 0, master.id);
   expect(value).toBe(4000);
-  value = master.evaluatePoint(points, { row: 1, column: 4 }, master.id);
+  value = master.evaluatePoint(points, 1, 4, master.id);
   expect(value).toBe(4000);
 
 
@@ -199,9 +199,9 @@ test('evaluatePoint', () => {
     ['o', 'o', 'o', 'o', 'o', 'o'],
   ];
 
-  value = master.evaluatePoint(points, { row: 1, column: 0 }, master.id);
+  value = master.evaluatePoint(points, 1, 0, master.id);
   expect(value).toBe(4000);
-  value = master.evaluatePoint(points, { row: 1, column: 4 }, master.id);
+  value = master.evaluatePoint(points, 1, 4, master.id);
   expect(value).toBe(4000);
 });
 
@@ -225,7 +225,7 @@ test('evaluatePoints', () => {
   ];
 
   let value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(20500);
+  expect(value).toBe(15800);
 
 
   points = [
@@ -238,7 +238,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(4700);
+  expect(value).toBe(0);
 
 
   points = [
@@ -251,7 +251,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(800);
+  expect(value).toBe(600);
 
   points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -263,7 +263,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(13780);
+  expect(value).toBe(9040);
 
 
   points = [
@@ -275,7 +275,7 @@ test('evaluatePoints', () => {
     ['o', 'o', 'o', 'o', 'o', ' '],
   ];
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(34200);
+  expect(value).toBe(-519995);
 
 
   points = [
@@ -288,7 +288,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(9000);
+  expect(value).toBe(-4178959);
 
 
   points = [
@@ -301,7 +301,7 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(16000);
+  expect(value).toBe(-4123959);
 
   points = [
     ['o', 'o', 'o', 'o', 'o', 'o'],
@@ -313,84 +313,10 @@ test('evaluatePoints', () => {
   ];
 
   value = master.evaluatePoints(points, master.id);
-  expect(value).toBe(16000);
+  expect(value).toBe(-4131959);
 
 });
 
-
-test('findAvailableMoves', () => {
-  let master = new Master({
-    id: 'x',
-    level: 'easy',
-    opponentId: 'o',
-
-  });
-  let points = [
-    [' ', 'x', 'o'],
-    ['x', 'x', ' '],
-    [' ', 'o', 'o'],
-  ];
-
-  const moves = master.findAvailableMoves(points);
-  expect(moves.length).toBe(3);
-  expect(moves[0]).toEqual({ row: 0, column: 0 });
-  expect(moves[1]).toEqual({ row: 1, column: 2 });
-  expect(moves[2]).toEqual({ row: 2, column: 0 });
-});
-
-
-test('sortMoves', () => {
-
-  let master = new Master({
-    id: 'x',
-    level: 'easy',
-    opponentId: 'o',
-
-  });
-  let attacker = 'x';
-  let defender = 'o';
-  let moves = [];
-
-
-  let points = [
-    ['x', 'o', ' ', 'o', 'o', 'o'],
-    ['x', 'x', 'x', 'x', ' ', ' '],
-    ['o', 'o', 'x', 'o', 'o', 'o'],
-    ['o', 'o', 'x', ' ', 'o', 'o'],
-    ['o', 'o', ' ', 'o', ' ', 'o'],
-    ['o', 'o', 'o', 'x', 'o', ' '],
-  ];
-
-  let reverse = false;
-  moves = master.findAvailableMoves(points);
-
-  expect(moves.length).toBe(7);
-  console.time("sortMoves");
-  master.sortMoves(points, moves, attacker, reverse);
-  console.timeEnd("sortMoves");
-  expect(moves[0]).toEqual({ row: 1, column: 4 });
-  expect(moves[1]).toEqual({ row: 3, column: 3 });
-  expect(moves[2]).toEqual({ row: 4, column: 4 });
-  expect(moves[3]).toEqual({ row: 0, column: 2 });
-  expect(moves[4]).toEqual({ row: 4, column: 2 });
-  expect(moves[5]).toEqual({ row: 1, column: 5 });
-  expect(moves[6]).toEqual({ row: 5, column: 5 });
-
-  reverse = true;
-  moves = master.findAvailableMoves(points);
-  expect(moves.length).toBe(7);
-  console.time("sortMoves");
-  master.sortMoves(points, moves, attacker, reverse);
-  console.timeEnd("sortMoves");
-
-  expect(moves[6]).toEqual({ row: 1, column: 4 });
-  expect(moves[5]).toEqual({ row: 3, column: 3 });
-  expect(moves[4]).toEqual({ row: 4, column: 4 });
-  expect(moves[3]).toEqual({ row: 4, column: 2 });
-  expect(moves[2]).toEqual({ row: 0, column: 2 });
-  expect(moves[1]).toEqual({ row: 1, column: 5 });
-  expect(moves[0]).toEqual({ row: 5, column: 5 });
-});
 
 test('oooox', () => {
   let master = new Master({
@@ -399,8 +325,7 @@ test('oooox', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
+
   // let points = [
   //   [' ', ' ', ' ', ' ', ' ', ' '],
   //   [' ', ' ', ' ', ' ', ' ', ' '],
@@ -418,7 +343,7 @@ test('oooox', () => {
     ['o', 'o', 'x', 'o', 'o', 'o'],
   ];
 
-  let value = master.minMax(points, attacker, attacker, defender, {
+  let value = master.minMax(points, 'x', {
     row: 1,
     column: 4
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -433,7 +358,7 @@ test('oooox', () => {
     ['o', 'o', 'x', 'o', 'o', 'o'],
   ];
 
-  value = master.minMax(points, attacker, attacker, defender, {
+  value = master.minMax(points, 'x', {
     row: 1,
     column: 0
   }, 1, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -448,7 +373,7 @@ test('oooox', () => {
     ['o', 'o', 'x', 'o', 'o', 'o'],
   ];
 
-  value = master.minMax(points, attacker, attacker, defender, {
+  value = master.minMax(points, 'x', {
     row: 1,
     column: 0
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -464,11 +389,11 @@ test('oooox', () => {
     ['o', 'o', 'x', 'o', 'o', 'o'],
   ];
 
-  value = master.minMax(points, attacker, attacker, defender, {
+  value = master.minMax(points, 'x', {
     row: 2,
     column: 2
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  expect(value).toBe(0);
+  expect(value).toBe(-499995);
 });
 
 
@@ -479,8 +404,7 @@ test('xooox', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
+
   let points = [
     ['o', 'o', 'o', 'o', 'o', 'o'],
     [' ', 'x', 'x', 'x', ' ', 'o'],
@@ -490,20 +414,20 @@ test('xooox', () => {
     ['o', 'o', 'o', 'o', 'o', 'o'],
   ];
 
-  let value2 = master.minMax(points, attacker, attacker, defender, {
+  let value2 = master.minMax(points, 'x', {
     row: 1,
     column: 0
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value3 = master.minMax(points, attacker, attacker, defender, {
+  let value3 = master.minMax(points, 'x', {
     row: 1,
     column: 4
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value4 = master.minMax(points, attacker, attacker, defender, {
+  let value4 = master.minMax(points, 'x', {
     row: 4,
     column: 4
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
 
-  expect(value3).toEqual(value2);
+  expect(value2).toBeGreaterThan(value3);
 });
 
 
@@ -514,8 +438,7 @@ test('minMax', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
+
 
   let points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -526,15 +449,15 @@ test('minMax', () => {
     [' ', ' ', 'o', ' ', ' ', ' '],
   ];
 
-  let value2 = master.minMax(points, attacker, attacker, defender, {
+  let value2 = master.minMax(points, 'x', {
     row: 2,
     column: 0
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value3 = master.minMax(points, attacker, attacker, defender, {
+  let value3 = master.minMax(points, 'x', {
     row: 2,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value4 = master.minMax(points, attacker, attacker, defender, {
+  let value4 = master.minMax(points, 'x', {
     row: 3,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -552,15 +475,15 @@ test('minMax', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  value2 = master.minMax(points, attacker, attacker, defender, {
+  value2 = master.minMax(points, 'x', {
     row: 1,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value3 = master.minMax(points, attacker, attacker, defender, {
+  value3 = master.minMax(points, 'x', {
     row: 1,
     column: 1
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value4 = master.minMax(points, attacker, attacker, defender, {
+  value4 = master.minMax(points, 'x', {
     row: 4,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -577,15 +500,15 @@ test('minMax', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  value2 = master.minMax(points, attacker, attacker, defender, {
+  value2 = master.minMax(points, 'x', {
     row: 2,
     column: 1
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value3 = master.minMax(points, attacker, attacker, defender, {
+  value3 = master.minMax(points, 'x', {
     row: 0,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  expect(value3).toBeGreaterThan(value2);
+  expect(value3).toEqual(value2);
 
   points = [
     [' ', ' ', ' ', ' ', 'o', ' '],
@@ -596,11 +519,11 @@ test('minMax', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  value2 = master.minMax(points, attacker, attacker, defender, {
+  value2 = master.minMax(points, 'x', {
     row: 3,
     column: 2
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value3 = master.minMax(points, attacker, attacker, defender, {
+  value3 = master.minMax(points, 'x', {
     row: 4,
     column: 1
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -622,8 +545,7 @@ test('minMax easy vs normal 1', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
+
 
 
   let points = [
@@ -635,15 +557,15 @@ test('minMax easy vs normal 1', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  let value2 = master.minMax(points, attacker, attacker, defender, {
+  let value2 = master.minMax(points, 'x', {
     row: 1,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value3 = master.minMax(points, attacker, attacker, defender, {
+  let value3 = master.minMax(points, 'x', {
     row: 1,
     column: 1
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value4 = master.minMax(points, attacker, attacker, defender, {
+  let value4 = master.minMax(points, 'x', {
     row: 4,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -651,15 +573,15 @@ test('minMax easy vs normal 1', () => {
   expect(value3).toBeGreaterThan(value2);
   expect(value3).toBeGreaterThan(value4);
 
-  value2 = normalMaster.minMax(points, attacker, attacker, defender, {
+  value2 = normalMaster.minMax(points, 'x', {
     row: 1,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value3 = normalMaster.minMax(points, attacker, attacker, defender, {
+  value3 = normalMaster.minMax(points, 'x', {
     row: 1,
     column: 1
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value4 = normalMaster.minMax(points, attacker, attacker, defender, {
+  value4 = normalMaster.minMax(points, 'x', {
     row: 4,
     column: 3
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -673,8 +595,7 @@ test('minMax easy vs normal 1', () => {
 
 test('minMax easy vs normal 2', () => {
 
-  let attacker = 'x';
-  let defender = 'o';
+
 
 
   let points = [
@@ -692,11 +613,11 @@ test('minMax easy vs normal 2', () => {
     opponentId: 'o',
 
   });
-  let value2 = master.minMax(points, attacker, attacker, defender, {
+  let value2 = master.minMax(points, 'x', {
     row: 2,
     column: 4
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  let value3 = master.minMax(points, attacker, attacker, defender, {
+  let value3 = master.minMax(points, 'x', {
     row: 2,
     column: 2
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -709,11 +630,11 @@ test('minMax easy vs normal 2', () => {
 
   });
 
-  value2 = master.minMax(points, attacker, attacker, defender, {
+  value2 = master.minMax(points, 'x', {
     row: 2,
     column: 4
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
-  value3 = master.minMax(points, attacker, attacker, defender, {
+  value3 = master.minMax(points, 'x', {
     row: 2,
     column: 2
   }, master.depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
@@ -728,8 +649,7 @@ test('generateLegalMoves', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
+
 
   let points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -742,11 +662,17 @@ test('generateLegalMoves', () => {
 
   let bestMoves = [{ row: 2, column: 0 }, { row: 2, column: 3 }, { row: 3, column: 3 }];
 
-  const moves = master.generateLegalMoves(points, attacker, defender);
+  const moves = master.generateLegalMoves(points);
   expect(moves).toEqual(expect.arrayContaining(bestMoves));
 });
 
 test('findBestMove normal vs hard', () => {
+  let easyMaster = new Master({
+    id: 'x',
+    level: 'easy',
+    opponentId: 'o',
+
+  });
   let normalMaster = new Master({
     id: 'x',
     level: 'normal',
@@ -759,8 +685,6 @@ test('findBestMove normal vs hard', () => {
     opponentId: 'o',
 
   });
-  let attacker = 'x';
-  let defender = 'o';
   let points = [
     [' ', ' ', ' ', ' ', ' ', ' '],
     [' ', ' ', ' ', ' ', ' ', ' '],
@@ -770,9 +694,9 @@ test('findBestMove normal vs hard', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  let normalBestMove = normalMaster.findBestMove(points, attacker, defender);
+  let normalBestMove = normalMaster.findBestMove(points);
   expect(normalBestMove).toEqual({ row: 2, column: 0 });
-  let hardBestMove = hardMaster.findBestMove(points, attacker, defender);
+  let hardBestMove = hardMaster.findBestMove(points);
   expect(hardBestMove).toEqual({ row: 2, column: 0 });
 
   points = [
@@ -784,9 +708,9 @@ test('findBestMove normal vs hard', () => {
     ['o', 'o', 'x', 'o', 'o', 'o'],
   ];
 
-  normalBestMove = normalMaster.findBestMove(points, attacker, defender);
+  normalBestMove = normalMaster.findBestMove(points);
   expect(normalBestMove).toEqual({ row: 2, column: 1 });
-  hardBestMove = hardMaster.findBestMove(points, attacker, defender);
+  hardBestMove = hardMaster.findBestMove(points);
   expect(hardBestMove).toEqual({ row: 2, column: 1 });
 
   points = [
@@ -798,9 +722,9 @@ test('findBestMove normal vs hard', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  normalBestMove = normalMaster.findBestMove(points, attacker, defender);
-  expect(normalBestMove).toEqual({ row: 2, column: 3 });
-  hardBestMove = hardMaster.findBestMove(points, attacker, defender);
+  normalBestMove = normalMaster.findBestMove(points);
+  expect(normalBestMove).toEqual({ row: 3, column: 0 });
+  hardBestMove = hardMaster.findBestMove(points);
   expect(hardBestMove).toEqual({ row: 3, column: 0 });
 
 
@@ -813,8 +737,35 @@ test('findBestMove normal vs hard', () => {
     [' ', ' ', ' ', ' ', ' ', ' '],
   ];
 
-  normalBestMove = normalMaster.findBestMove(points, attacker, defender);
+  normalBestMove = normalMaster.findBestMove(points);
   expect(normalBestMove).toEqual({ row: 0, column: 0 });
-  hardBestMove = hardMaster.findBestMove(points, attacker, defender);
+  hardBestMove = hardMaster.findBestMove(points);
   expect(hardBestMove).toEqual({ row: 0, column: 0 });
+
+
+  points = [
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', 'x', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'o', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'o', 'x', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', 'o', 'x', 'o', 'x', 'o', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', 'x', 'o', 'o', 'o', 'o', 'x', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', 'x', 'o', 'x', 'x', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', 'x', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  ];
+
+
+  easyBestMove = easyMaster.findBestMove(points);
+  expect(easyBestMove).toEqual({ row: 6, column: 6 });
+  normalBestMove = normalMaster.findBestMove(points);
+  expect(normalBestMove).toEqual({ row: 10, column: 6 });
+  hardBestMove = hardMaster.findBestMove(points);
+  expect(hardBestMove).toEqual({ row: 6, column: 6 });
 });

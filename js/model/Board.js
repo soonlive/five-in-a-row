@@ -107,7 +107,7 @@ class Board {
       let currentColumn = column - columnStep * i;
 
       if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
-        const targetPoint = new Point(currentColumn, currentRow, playerId);
+        const targetPoint = new Point(currentRow, currentColumn, playerId);
         sameRowPoints.unshift(targetPoint);
       } else {
         break;
@@ -118,7 +118,7 @@ class Board {
       let currentRow = row + rowStep * i;
       let currentColumn = column + columnStep * i;
       if (this.points[currentRow] && this.points[currentRow][currentColumn] === playerId) {
-        const targetPoint = new Point(currentColumn, currentRow, playerId);
+        const targetPoint = new Point(currentRow, currentColumn, playerId);
         sameRowPoints.push(targetPoint);
       } else {
         break;

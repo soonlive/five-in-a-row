@@ -11,7 +11,7 @@ class Controller {
     });
     this.playerII = new Master({
       id: 'x',
-      level: 'normal',
+      level: 'hard',
       opponentId: 'o',
     });
   }

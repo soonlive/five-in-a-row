@@ -3,7 +3,7 @@
  */
 
 class Point {
-  constructor(column, row, playerId) {
+  constructor(row, column, playerId) {
     this.column = column;
     this.row = row;
     this.playerId = playerId;
