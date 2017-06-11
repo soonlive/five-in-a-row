@@ -9,3 +9,7 @@ class Point {
     this.playerId = playerId;
   }
 }
+
+Point.X = 'x';
+Point.O = 'o';
+Point.EMPTY = ' ';

@@ -4,7 +4,7 @@
 
 class App {
   constructor() {
-    this.board = new Board(Constants.SIZE, Constants.SAME_ROW_POINTS_SIZE);
+    this.board = new Board(Constants.SIZE);
     this.view = new View();
     this.controller = new Controller(this.view, this.board);
   }

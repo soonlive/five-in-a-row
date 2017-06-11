@@ -3,7 +3,7 @@
  */
 test('findSameRowPoints', () => {
 
-  let board = new Board(6, 5);
+  let board = new Board(6);
 
   let point = { row: 2, column: 0, playerId: 'o' };
 

@@ -4,6 +4,9 @@
 const fs = require('fs');
 eval(fs.readFileSync('./js/Constants.js')+';global.Constants = Constants;');
 eval(fs.readFileSync('./js/EventHub.js')+';global.EventHub = EventHub;');
+eval(fs.readFileSync('./js/model/ZobristHash.js')+';global.ZobristHash = ZobristHash;');
+eval(fs.readFileSync('./js/model/TranspositionTableEntry.js')+';global.TranspositionTableEntry = TranspositionTableEntry;');
+eval(fs.readFileSync('./js/model/TranspositionTable.js')+';global.TranspositionTable = TranspositionTable;');
 eval(fs.readFileSync('./js/model/Move.js')+';global.Move = Move;');
 eval(fs.readFileSync('./js/model/Point.js')+';global.Point = Point;');
 eval(fs.readFileSync('./js/model/Player.js')+';global.Player = Player;');

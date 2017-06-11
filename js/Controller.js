@@ -11,8 +11,9 @@ class Controller {
     });
     this.playerII = new Master({
       id: 'x',
-      level: 'hard',
+      level: 'normal',
       opponentId: 'o',
+      board,
     });
   }
 
@@ -32,6 +33,7 @@ class Controller {
     let { view, board, playerI, playerII } = this;
     playerI.setStoneType('circle');
     playerII.setStoneType('cross');
+    view.newRound();
 
     board.newRound();
     board.addPlayer(playerI);
@@ -39,7 +41,8 @@ class Controller {
 
     board.setCurrentPlayer(playerI);
 
-    view.newRound();
+    // board.setCurrentPlayer(playerII);
+    // playerII.move(7, 7);
   }
 
   turnover(player) {

@@ -3,7 +3,7 @@
  */
 
 class Board {
-  constructor(size, sameRowPointsSize) {
+  constructor(size) {
     this.eventHub = new EventHub();
     this.size = size;
     this.points = null;
@@ -12,7 +12,6 @@ class Board {
     this.currentPlayer = null;
     this.isPlaying = false;
     this.players = [];
-    this.sameRowPointsSize = sameRowPointsSize;
     this.sameRowPoints = [];
     this.winner = null;
   }
@@ -128,24 +127,24 @@ class Board {
     return sameRowPoints;
   }
 
-  searchSameRowPointsWithLimitSize(point, size) {
+  searchConnectFive(point) {
 
     //  direction: -
     let sameRowPoints = this.searchSameRowPoints(point, 0, 1);
     //  direction: |
-    if (sameRowPoints.length < size) {
+    if (sameRowPoints.length < 5) {
       sameRowPoints = this.searchSameRowPoints(point, 1, 0);
     }
     //  direction: \
-    if (sameRowPoints.length < size) {
+    if (sameRowPoints.length < 5) {
       sameRowPoints = this.searchSameRowPoints(point, 1, 1);
     }
     //  direction: /
-    if (sameRowPoints.length < size) {
+    if (sameRowPoints.length < 5) {
       sameRowPoints = this.searchSameRowPoints(point, -1, 1);
     }
 
-    return sameRowPoints.length >= size ? sameRowPoints : null;
+    return sameRowPoints.length >= 5 ? sameRowPoints : null;
   }
 
   notifyWin(playerId, sameRowPoints) {
@@ -169,7 +168,7 @@ class Board {
 
   evaluate(point) {
     const { column, row, playerId } = point;
-    const sameRowPoints = this.searchSameRowPointsWithLimitSize(point, this.sameRowPointsSize);
+    const sameRowPoints = this.searchConnectFive(point);
 
     if (sameRowPoints) {
       this.notifyWin(playerId, sameRowPoints);

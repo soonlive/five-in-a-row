@@ -4,7 +4,7 @@
 
 class Master extends Player {
 
-  constructor({ id, level, opponentId }) {
+  constructor({ id, level, opponentId, board }) {
     super({ id });
 
     this.setLevel(level);
@@ -12,43 +12,35 @@ class Master extends Player {
     this.opponentId = opponentId;
 
     this.scores = {
-      'ooooo': 99999,
-      'xoooox': 7000,
-      'xoooo': 4000,
-      'oooox': 4000,
-      'xoxooo': 2000,
-      'xooxoo': 2000,
-      'xoooxo': 2000,
-      'oooxox': 2000,
-      'ooxoox': 2000,
-      'oxooox': 2000,
+      'ooooo': 50000,
+      'xoooxx': 720,
+      'xooxox': 720,
+      'oooox': 720,
+      'ooxoo': 720,
+      'oooxo': 720,
+      'xxoxox': 120,
+      'xxxoxx': 20,
 
-      'oxooo': 2000,
-      'oooxo': 2000,
-
-      'xooox': 3000,
-      'xxooo': 1500,
-      'oooxx': 1500,
-      'xooxo': 800,
-      'xoxoo': 800,
-      'ooxox': 800,
-      'oxoox': 800,
-      'xooxx': 150,
-      'xxoox': 150,
-      'ooxxx': 100,
-      'xxxoo': 100,
-      'xxoxx': 40,
-      'oxoxx': 80,
-      'xxoxo': 80,
+      'xoooox': 4320,
+      'xxooox': 720,
+      'xoxoox': 720,
+      'xoooo': 720,
+      'oxooo': 720,
+      'xxooxx': 720,
+      'xoxoxx': 120,
+      'xxoxxx': 20,
     };
 
+    this.board = board;
+    this.zobristHash = new ZobristHash(board.size);
+    this.transpositionTable = new TranspositionTable(50000);
   }
 
   setLevel(level) {
     this.level = level;
     switch (level) {
       case 'hard':
-        this.depth = 7;
+        this.depth = 10;
         this.limit = 16;
         break;
       case 'easy':
@@ -57,49 +49,92 @@ class Master extends Player {
         break;
       case 'normal':
       default:
-        this.depth = 5;
+        this.depth = 7;
         this.limit = 8;
         break;
     }
   }
 
+
+
   minMax(points, playerId, move, depth, alpha, beta) {
 
-    if (depth <= 0) {
-      return this.evaluatePoints(points);
+    const hash = this.zobristHash.hash(points);
+
+    let score = this.ProbeHash(hash, depth, alpha, beta);
+    if (score !== null) {
+      return score;
     }
 
-    points[move.row][move.column] = playerId;
+    if (depth <= 0) {
+      let score = this.evaluatePoints(points);
+      this.RecordHash(hash, depth, score, 0, move);
+      return score;
+    }
+
+
     const moves = this.generateLegalMoves(points);
     const limit = Math.min(moves.length, this.limit);
 
     // no more move is available, match end
     if (moves.length < 1) {
-      return this.evaluatePoints(points);
+      let score = this.evaluatePoints(points);
+      this.RecordHash(hash, depth, score, 0, move);
+      return score;
     }
 
     if (playerId === this.id) {
       let bestValue = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
+        points[move.row][move.column] = playerId;
         bestValue = this.minMax(points, this.opponentId, moves[i], depth - 1, alpha, beta);
+        points[move.row][move.column] = ' ';
         alpha = Math.max(alpha, bestValue);
         if (alpha >= beta)
           break;
       }
-      points[move.row][move.column] = ' ';
+      this.RecordHash(hash, depth, bestValue, 1, move);
       return bestValue;
     } else {
       let bestValue = Number.POSITIVE_INFINITY;
       for (let i = 0; i < limit; i++) {
+        points[move.row][move.column] = playerId;
         bestValue = this.minMax(points, this.id, moves[i], depth - 1, alpha, beta);
+        points[move.row][move.column] = ' ';
         beta = Math.min(beta, bestValue);
         if (alpha >= beta)
           break;
       }
-      points[move.row][move.column] = ' ';
+      this.RecordHash(hash, depth, bestValue, 2, move);
       return bestValue;
     }
   }
+
+  ProbeHash(hash, depth, alpha, beta) {
+    let entry = this.transpositionTable.getEntry(hash);
+
+
+    if (entry) {
+      if (entry.depth >= depth) {
+        if (entry.hashf === 0) {
+          return entry.score;
+        }
+        if ((entry.hashf === 1) && (entry.score <= alpha)) {
+          return alpha;
+        }
+        if ((entry.hashf === 2) && (entry.score >= beta)) {
+          return beta;
+        }
+      }
+    }
+    return null;
+  }
+
+  RecordHash(hash, depth, score, hashf, move) {
+    let entry = new TranspositionTableEntry({ hash, depth, score, hashf, move });
+    this.transpositionTable.addEntry(entry);
+  }
+
 
   evaluatePoints(points) {
     let totalValue = 0;
@@ -338,7 +373,9 @@ class Master extends Player {
 
   findBestMove(points) {
     let max = Number.NEGATIVE_INFINITY;
+
     let bestMoveIndex = 0;
+
     const moves = this.generateLegalMoves(points);
     const limit = Math.min(moves.length, this.limit);
     for (let i = 0; i < limit; i++) {
