@@ -9,10 +9,13 @@
   "author": "soonlive",
   "license": "ISC",
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "eslint": "^3.19.0",
-    "jest": "^20.0.3"
+    "jest": "20.0.4"
   },
   "jest": {
-    "setupFiles": ["./preprocessor.js"]
+    "setupFiles": [
+      "./preprocessor.js"
+    ]
   }
 }

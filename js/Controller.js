@@ -6,14 +6,14 @@ class Controller {
   constructor(view, board) {
     this.view = view;   // view obj
     this.board = board; // this is a model obj, not a view obj
+    this.evaluator = new Evaluator({ board });
     this.playerI = new Player({
       id: 'o',
     });
     this.playerII = new Master({
       id: 'x',
-      level: 'normal',
-      opponentId: 'o',
-      board,
+      evaluator: this.evaluator,
+      opponentId: this.playerI.id,
     });
   }
 

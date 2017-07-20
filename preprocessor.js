@@ -10,6 +10,7 @@ eval(fs.readFileSync('./js/model/TranspositionTable.js')+';global.TranspositionT
 eval(fs.readFileSync('./js/model/Move.js')+';global.Move = Move;');
 eval(fs.readFileSync('./js/model/Point.js')+';global.Point = Point;');
 eval(fs.readFileSync('./js/model/Player.js')+';global.Player = Player;');
+eval(fs.readFileSync('./js/model/Evaluator.js')+';global.Evaluator = Evaluator;');
 eval(fs.readFileSync('./js/model/Master.js')+';global.Master = Master;');
 eval(fs.readFileSync('./js/model/Board.js')+';global.Board = Board;');
 eval(fs.readFileSync('./js/components/GoBoard.js')+';global.GoBoard = GoBoard;');
